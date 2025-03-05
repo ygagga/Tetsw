@@ -18,32 +18,39 @@ local Window = Fluent:CreateWindow({
 local function killPlayer(player)
     local character = player.Character
     if character and character:FindFirstChild("HumanoidRootPart") then
-        -- Spawn do sofá
+        -- Spawn do sofá na mão do jogador
         local sofa = Instance.new("Part")
         sofa.Size = Vector3.new(5, 1, 5)
-        sofa.Anchored = true
+        sofa.Anchored = false
         sofa.CanCollide = false
         sofa.Position = game.Players.LocalPlayer.Character.HumanoidRootPart.Position
         sofa.Parent = game.Workspace
 
-        -- Conectar função de matar com o sofá
+        -- Criar um motor de corpo (BodyPosition) para manter o sofá na mão
+        local bodyPosition = Instance.new("BodyPosition")
+        bodyPosition.MaxForce = Vector3.new(100000, 100000, 100000)
+        bodyPosition.P = 10000
+        bodyPosition.D = 1000
+        bodyPosition.Parent = sofa
+
+        -- Ajeita o sofá para a posição da mão
+        local hand = game.Players.LocalPlayer.Character:WaitForChild("RightHand")
+        bodyPosition.Position = hand.Position + Vector3.new(0, 2, 0)
+
+        -- Espera até que o sofá seja pego
+        wait(0.5)
+
+        -- Teleportar o jogador selecionado para o void
         local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
+        humanoidRootPart.CFrame = CFrame.new(-5000, -5000, -5000)
 
-        -- Teleporta o player selecionado para o void
-        sofa.Touched:Connect(function(hit)
-            local humanoid = hit.Parent:FindFirstChild("Humanoid")
-            if humanoid then
-                humanoid.Health = 0
-            end
-        end)
+        -- Matar o jogador
+        humanoidRootPart.CFrame = CFrame.new(-5000, -5000, -5000)
 
-        -- Teleportar para o local do sofá
-        sofa.CFrame = humanoidRootPart.CFrame
-
-        -- Voltar o jogador para o local inicial
+        -- Voltar o jogador que fez a ação para o local inicial
         game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(-212, -499, -627)
         
-        -- Depois que o jogador for teleportado e morto, remove o sofá
+        -- Esperar um pouco e destruir o sofá
         wait(1)
         sofa:Destroy()
     end
