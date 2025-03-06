@@ -1,396 +1,273 @@
--- Gui to Lua
--- Version: 3.2
+-- Carrega as bibliotecas Fluent, SaveManager e InterfaceManager
+local Fluent = loadstring(game:HttpGet("https://github.com/dawid-scripts/Fluent/releases/latest/download/main.lua"))()
+local SaveManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Addons/SaveManager.lua"))()
+local InterfaceManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Addons/InterfaceManager.lua"))()
 
--- Instances:
+-- Criando a Janela da Interface
+local Window = Fluent:CreateWindow({
+    Title = "Brookhaven RP 🏡 (Troll Hub 🤡)",
+    SubTitle = "🔥 Zoando geral! 💀",
+    TabWidth = 160,
+    Size = UDim2.fromOffset(500, 320),
+    Acrylic = true,
+    Theme = "Dark",
+    MinimizeKey = Enum.KeyCode.LeftControl
+})
 
-local main = Instance.new("ScreenGui")
-local Frame = Instance.new("Frame")
-local up = Instance.new("TextButton")
-local down = Instance.new("TextButton")
-local onof = Instance.new("TextButton")
-local TextLabel = Instance.new("TextLabel")
-local plus = Instance.new("TextButton")
-local speed = Instance.new("TextLabel")
-local mine = Instance.new("TextButton")
+-- Função para trocar a cabeça do avatar
+local function changeAvatar(id, notificationTitle)
+    local argsTable = (type(id) == "table") and id or {1, 1, 1, 1, 1, id}
 
---Properties:
+    local args = {
+        [1] = "CharacterChange",
+        [2] = argsTable,
+        [3] = "🔥 Troll Hub 💀"
+    }
 
-main.Name = "main"
-main.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
-main.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+    local replicatedStorage = game:GetService("ReplicatedStorage")
+    local starterGui = game:GetService("StarterGui")
 
-Frame.Parent = main
-Frame.BackgroundColor3 = Color3.fromRGB(163, 255, 137)
-Frame.BorderColor3 = Color3.fromRGB(103, 221, 213)
-Frame.Position = UDim2.new(0.100320168, 0, 0.379746825, 0)
-Frame.Size = UDim2.new(0, 190, 0, 57)
-
-up.Name = "up"
-up.Parent = Frame
-up.BackgroundColor3 = Color3.fromRGB(79, 255, 152)
-up.Size = UDim2.new(0, 44, 0, 28)
-up.Font = Enum.Font.SourceSans
-up.Text = "UP"
-up.TextColor3 = Color3.fromRGB(0, 0, 0)
-up.TextSize = 14.000
-
-down.Name = "down"
-down.Parent = Frame
-down.BackgroundColor3 = Color3.fromRGB(215, 255, 121)
-down.Position = UDim2.new(0, 0, 0.491228074, 0)
-down.Size = UDim2.new(0, 44, 0, 28)
-down.Font = Enum.Font.SourceSans
-down.Text = "DOWN"
-down.TextColor3 = Color3.fromRGB(0, 0, 0)
-down.TextSize = 14.000
-
-onof.Name = "onof"
-onof.Parent = Frame
-onof.BackgroundColor3 = Color3.fromRGB(255, 249, 74)
-onof.Position = UDim2.new(0.702823281, 0, 0.491228074, 0)
-onof.Size = UDim2.new(0, 56, 0, 28)
-onof.Font = Enum.Font.SourceSans
-onof.Text = "fly"
-onof.TextColor3 = Color3.fromRGB(0, 0, 0)
-onof.TextSize = 14.000
-
-TextLabel.Parent = Frame
-TextLabel.BackgroundColor3 = Color3.fromRGB(242, 60, 255)
-TextLabel.Position = UDim2.new(0.469327301, 0, 0, 0)
-TextLabel.Size = UDim2.new(0, 100, 0, 28)
-TextLabel.Font = Enum.Font.SourceSans
-TextLabel.Text = "gui by me_ozoneYT"
-TextLabel.TextColor3 = Color3.fromRGB(0, 0, 0)
-TextLabel.TextScaled = true
-TextLabel.TextSize = 14.000
-TextLabel.TextWrapped = true
-
-plus.Name = "plus"
-plus.Parent = Frame
-plus.BackgroundColor3 = Color3.fromRGB(133, 145, 255)
-plus.Position = UDim2.new(0.231578946, 0, 0, 0)
-plus.Size = UDim2.new(0, 45, 0, 28)
-plus.Font = Enum.Font.SourceSans
-plus.Text = "+"
-plus.TextColor3 = Color3.fromRGB(0, 0, 0)
-plus.TextScaled = true
-plus.TextSize = 14.000
-plus.TextWrapped = true
-
-speed.Name = "speed"
-speed.Parent = Frame
-speed.BackgroundColor3 = Color3.fromRGB(255, 85, 0)
-speed.Position = UDim2.new(0.468421042, 0, 0.491228074, 0)
-speed.Size = UDim2.new(0, 44, 0, 28)
-speed.Font = Enum.Font.SourceSans
-speed.Text = "1"
-speed.TextColor3 = Color3.fromRGB(0, 0, 0)
-speed.TextScaled = true
-speed.TextSize = 14.000
-speed.TextWrapped = true
-
-mine.Name = "mine"
-mine.Parent = Frame
-mine.BackgroundColor3 = Color3.fromRGB(123, 255, 247)
-mine.Position = UDim2.new(0.231578946, 0, 0.491228074, 0)
-mine.Size = UDim2.new(0, 45, 0, 29)
-mine.Font = Enum.Font.SourceSans
-mine.Text = "-"
-mine.TextColor3 = Color3.fromRGB(0, 0, 0)
-mine.TextScaled = true
-mine.TextSize = 14.000
-mine.TextWrapped = true
-
-speeds = 1
-
-local speaker = game:GetService("Players").LocalPlayer
-
-local chr = game.Players.LocalPlayer.Character
-local hum = chr and chr:FindFirstChildWhichIsA("Humanoid")
-
-nowe = false
-
-game:GetService("StarterGui"):SetCore("SendNotification", { 
-    Title = "GO SUB TO HIM";
-    Text = "fly gui by me_ozoneYT";
-    Icon = "rbxthumb://type=Asset&id=5107182114&w=150&h=150"})
-Duration = 16;
-
-Frame.Active = true -- main = gui
-Frame.Draggable = true
-
-onof.MouseButton1Down:connect(function()
-
-    if nowe == true then
-        nowe = false
-
-        speaker.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Climbing,true)
-        speaker.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.FallingDown,true)
-        speaker.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Flying,true)
-        speaker.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Freefall,true)
-        speaker.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.GettingUp,true)
-        speaker.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Jumping,true)
-        speaker.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Landed,true)
-        speaker.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Physics,true)
-        speaker.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.PlatformStanding,true)
-        speaker.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Ragdoll,true)
-        speaker.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Running,true)
-        speaker.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.RunningNoPhysics,true)
-        speaker.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Seated,true)
-        speaker.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.StrafingNoPhysics,true)
-        speaker.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Swimming,true)
-        speaker.Character.Humanoid:ChangeState(Enum.HumanoidStateType.RunningNoPhysics)
-    else 
-        nowe = true
-
-
-
-        for i = 1, speeds do
-            spawn(function()
-
-                local hb = game:GetService("RunService").Heartbeat
-
-
-                tpwalking = true
-                local chr = game.Players.LocalPlayer.Character
-                local hum = chr and chr:FindFirstChildWhichIsA("Humanoid")
-                while tpwalking and hb:Wait() and chr and hum and hum.Parent do
-                    if hum.MoveDirection.Magnitude > 0 then
-                        chr:TranslateBy(hum.MoveDirection)
-                    end
-                end
-
-            end)
+    if replicatedStorage and starterGui then
+        local remote = replicatedStorage.RE:FindFirstChild("1Avata1rOrigina1l")
+        if remote then
+            remote:FireServer(unpack(args))
+            starterGui:SetCore("SendNotification", {
+                Title = notificationTitle,
+                Text = "Aguarde 1-10 segundos...",
+                Duration = 5
+            })
         end
-        game.Players.LocalPlayer.Character.Animate.Disabled = true
-        local Char = game.Players.LocalPlayer.Character
-        local Hum = Char:FindFirstChildOfClass("Humanoid") or Char:FindFirstChildOfClass("AnimationController")
-
-        for i,v in next, Hum:GetPlayingAnimationTracks() do
-            v:AdjustSpeed(0)
-        end
-        speaker.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Climbing,false)
-        speaker.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.FallingDown,false)
-        speaker.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Flying,false)
-        speaker.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Freefall,false)
-        speaker.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.GettingUp,false)
-        speaker.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Jumping,false)
-        speaker.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Landed,false)
-        speaker.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Physics,false)
-        speaker.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.PlatformStanding,false)
-        speaker.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Ragdoll,false)
-        speaker.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Running,false)
-        speaker.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.RunningNoPhysics,false)
-        speaker.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Seated,false)
-        speaker.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.StrafingNoPhysics,false)
-        speaker.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Swimming,false)
-        speaker.Character.Humanoid:ChangeState(Enum.HumanoidStateType.Swimming)
     end
+end
 
+-- Criando Abas
+local Tabs = {
+    Avatar = Window:AddTab({ Title = "👤 Avatar", Icon = "shirt" }),
+    Troll = Window:AddTab({ Title = "🤡 Troll", Icon = "alert" }),
+    Hacks = Window:AddTab({ Title = "⚡ Hacks", Icon = "zap" }),
+    About = Window:AddTab({ Title = "ℹ️ Sobre", Icon = "info" })
+}
 
+-----------------------------------------------------------
+-- 👤 Avatar
+-----------------------------------------------------------
+Tabs.Avatar:AddSection("Trocar Cabeça")
 
-
-    if game:GetService("Players").LocalPlayer.Character:FindFirstChildOfClass("Humanoid").RigType == Enum.HumanoidRigType.R6 then
-
-
-
-        local plr = game.Players.LocalPlayer
-        local torso = plr.Character.Torso
-        local flying = true
-        local deb = true
-        local ctrl = {f = 0, b = 0, l = 0, r = 0}
-        local lastctrl = {f = 0, b = 0, l = 0, r = 0}
-        local maxspeed = 50
-        local speed = 0
-
-
-        local bg = Instance.new("BodyGyro", torso)
-        bg.P = 9e4
-        bg.maxTorque = Vector3.new(9e9, 9e9, 9e9)
-        bg.cframe = torso.CFrame
-        local bv = Instance.new("BodyVelocity", torso)
-        bv.velocity = Vector3.new(0,0.1,0)
-        bv.maxForce = Vector3.new(9e9, 9e9, 9e9)
-        if nowe == true then
-            plr.Character.Humanoid.PlatformStand = true
-        end
-        while nowe == true or game:GetService("Players").LocalPlayer.Character.Humanoid.Health == 0 do
-            game:GetService("RunService").RenderStepped:Wait()
-
-            if ctrl.l + ctrl.r ~= 0 or ctrl.f + ctrl.b ~= 0 then
-                speed = speed+.5+(speed/maxspeed)
-                if speed > maxspeed then
-                    speed = maxspeed
-                end
-            elseif not (ctrl.l + ctrl.r ~= 0 or ctrl.f + ctrl.b ~= 0) and speed ~= 0 then
-                speed = speed-1
-                if speed < 0 then
-                    speed = 0
-                end
-            end
-            if (ctrl.l + ctrl.r) ~= 0 or (ctrl.f + ctrl.b) ~= 0 then
-                bv.velocity = ((game.Workspace.CurrentCamera.CoordinateFrame.lookVector * (ctrl.f+ctrl.b)) + ((game.Workspace.CurrentCamera.CoordinateFrame * CFrame.new(ctrl.l+ctrl.r,(ctrl.f+ctrl.b)*.2,0).p) - game.Workspace.CurrentCamera.CoordinateFrame.p))*speed
-                lastctrl = {f = ctrl.f, b = ctrl.b, l = ctrl.l, r = ctrl.r}
-            elseif (ctrl.l + ctrl.r) == 0 and (ctrl.f + ctrl.b) == 0 and speed ~= 0 then
-                bv.velocity = ((game.Workspace.CurrentCamera.CoordinateFrame.lookVector * (lastctrl.f+lastctrl.b)) + ((game.Workspace.CurrentCamera.CoordinateFrame * CFrame.new(lastctrl.l+lastctrl.r,(lastctrl.f+lastctrl.b)*.2,0).p) - game.Workspace.CurrentCamera.CoordinateFrame.p))*speed
-            else
-                bv.velocity = Vector3.new(0,0,0)
-            end
-            --  game.Players.LocalPlayer.Character.Animate.Disabled = true
-            bg.cframe = game.Workspace.CurrentCamera.CoordinateFrame * CFrame.Angles(-math.rad((ctrl.f+ctrl.b)*50*speed/maxspeed),0,0)
-        end
-        ctrl = {f = 0, b = 0, l = 0, r = 0}
-        lastctrl = {f = 0, b = 0, l = 0, r = 0}
-        speed = 0
-        bg:Destroy()
-        bv:Destroy()
-        plr.Character.Humanoid.PlatformStand = false
-        game.Players.LocalPlayer.Character.Animate.Disabled = false
-        tpwalking = false
-
-
-
-
-    else
-        local plr = game.Players.LocalPlayer
-        local UpperTorso = plr.Character.UpperTorso
-        local flying = true
-        local deb = true
-        local ctrl = {f = 0, b = 0, l = 0, r = 0}
-        local lastctrl = {f = 0, b = 0, l = 0, r = 0}
-        local maxspeed = 50
-        local speed = 0
-
-
-        local bg = Instance.new("BodyGyro", UpperTorso)
-        bg.P = 9e4
-        bg.maxTorque = Vector3.new(9e9, 9e9, 9e9)
-        bg.cframe = UpperTorso.CFrame
-        local bv = Instance.new("BodyVelocity", UpperTorso)
-        bv.velocity = Vector3.new(0,0.1,0)
-        bv.maxForce = Vector3.new(9e9, 9e9, 9e9)
-        if nowe == true then
-            plr.Character.Humanoid.PlatformStand = true
-        end
-        while nowe == true or game:GetService("Players").LocalPlayer.Character.Humanoid.Health == 0 do
-            wait()
-
-            if ctrl.l + ctrl.r ~= 0 or ctrl.f + ctrl.b ~= 0 then
-                speed = speed+.5+(speed/maxspeed)
-                if speed > maxspeed then
-                    speed = maxspeed
-                end
-            elseif not (ctrl.l + ctrl.r ~= 0 or ctrl.f + ctrl.b ~= 0) and speed ~= 0 then
-                speed = speed-1
-                if speed < 0 then
-                    speed = 0
-                end
-            end
-            if (ctrl.l + ctrl.r) ~= 0 or (ctrl.f + ctrl.b) ~= 0 then
-                bv.velocity = ((game.Workspace.CurrentCamera.CoordinateFrame.lookVector * (ctrl.f+ctrl.b)) + ((game.Workspace.CurrentCamera.CoordinateFrame * CFrame.new(ctrl.l+ctrl.r,(ctrl.f+ctrl.b)*.2,0).p) - game.Workspace.CurrentCamera.CoordinateFrame.p))*speed
-                lastctrl = {f = ctrl.f, b = ctrl.b, l = ctrl.l, r = ctrl.r}
-            elseif (ctrl.l + ctrl.r) == 0 and (ctrl.f + ctrl.b) == 0 and speed ~= 0 then
-                bv.velocity = ((game.Workspace.CurrentCamera.CoordinateFrame.lookVector * (lastctrl.f+lastctrl.b)) + ((game.Workspace.CurrentCamera.CoordinateFrame * CFrame.new(lastctrl.l+lastctrl.r,(lastctrl.f+lastctrl.b)*.2,0).p) - game.Workspace.CurrentCamera.CoordinateFrame.p))*speed
-            else
-                bv.velocity = Vector3.new(0,0,0)
-            end
-
-            bg.cframe = game.Workspace.CurrentCamera.CoordinateFrame * CFrame.Angles(-math.rad((ctrl.f+ctrl.b)*50*speed/maxspeed),0,0)
-        end
-        ctrl = {f = 0, b = 0, l = 0, r = 0}
-        lastctrl = {f = 0, b = 0, l = 0, r = 0}
-        speed = 0
-        bg:Destroy()
-        bv:Destroy()
-        plr.Character.Humanoid.PlatformStand = false
-        game.Players.LocalPlayer.Character.Animate.Disabled = false
-        tpwalking = false
-
-
-
-    end
-
-
-
-
-
-end)
-
-
-up.MouseButton1Down:connect(function()
-    game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame * CFrame.new(0,2,0)
-
-end)
-
-
-down.MouseButton1Down:connect(function()
-
-    game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame * CFrame.new(0,-2,0)
-
-end)
-
-
-game:GetService("Players").LocalPlayer.CharacterAdded:Connect(function(char)
-    wait(0.7)
-    game.Players.LocalPlayer.Character.Humanoid.PlatformStand = false
-    game.Players.LocalPlayer.Character.Animate.Disabled = false
-
-end)
-
-
-plus.MouseButton1Down:connect(function()
-    speeds = speeds + 1
-    speed.Text = speeds
-    if nowe == true then
-
-
-    tpwalking = false
-    for i = 1, speeds do
-        spawn(function()
-
-            local hb = game:GetService("RunService").Heartbeat
-
-
-            tpwalking = true
-            local chr = game.Players.LocalPlayer.Character
-            local hum = chr and chr:FindFirstChildWhichIsA("Humanoid")
-            while tpwalking and hb:Wait() and chr and hum and hum.Parent do
-                if hum.MoveDirection.Magnitude > 0 then
-                    chr:TranslateBy(hum.MoveDirection)
-                end
-            end
-
-        end)
-        end
-        end
-end)
-mine.MouseButton1Down:connect(function()
-    if speeds == 1 then
-        speed.Text = 'can not be less than 1'
+Tabs.Avatar:AddInput("Head ID", {
+    Title = "Digite o ID da Cabeça",
+    Default = "",
+    Placeholder = "ID",
+    Numeric = true,
+    Finished = true,
+    Callback = function(s)
+        changeAvatar(tonumber(s), "Carregando...")
         wait(1)
-        speed.Text = speeds
-    else
-    speeds = speeds - 1
-        speed.Text = speeds
-        if nowe == true then
-    tpwalking = false
-    for i = 1, speeds do
-        spawn(function()
+        game:GetService("StarterGui"):SetCore("SendNotification", {
+            Title = "Pronto!",
+            Text = "Cabeça alterada com sucesso ✅",
+            Duration = 3
+        })
+    end
+})
 
-            local hb = game:GetService("RunService").Heartbeat
+Tabs.Avatar:AddButton({
+    Title = "Headless Horseman",
+    Description = "Cabeça invisível!",
+    Callback = function()
+        changeAvatar(134082579, "Headless Horseman Aplicado!")
+    end
+})
 
+Tabs.Avatar:AddButton({
+    Title = "Blaze Burner",
+    Description = "Cabeça flamejante 🔥",
+    Callback = function()
+        changeAvatar(3210773801, "Blaze Burner Aplicado!")
+    end
+})
 
-            tpwalking = true
-            local chr = game.Players.LocalPlayer.Character
-            local hum = chr and chr:FindFirstChildWhichIsA("Humanoid")
-            while tpwalking and hb:Wait() and chr and hum and hum.Parent do
-                if hum.MoveDirection.Magnitude > 0 then
-                    chr:TranslateBy(hum.MoveDirection)
+-----------------------------------------------------------
+-- 🤡 Troll (ESP)
+-----------------------------------------------------------
+Tabs.Troll:AddSection("Trollando no servidor!")
+
+-- ESP (Nome do Jogador e Distância)
+local espActive = false
+local espElements = {}  -- Tabela para armazenar os elementos de ESP criados
+
+Tabs.Troll:AddButton({
+    Title = "Ativar ESP 🔍",
+    Description = "Veja o nome e distância dos jogadores!",
+    Callback = function()
+        espActive = true
+        for _, player in pairs(game.Players:GetPlayers()) do
+            if player.Character and player ~= game.Players.LocalPlayer then
+                local billboardGui = Instance.new("BillboardGui")
+                billboardGui.Parent = player.Character.Head
+                billboardGui.Adornee = player.Character.Head
+                billboardGui.Size = UDim2.new(0, 100, 0, 50)
+                billboardGui.StudsOffset = Vector3.new(0, 2, 0)
+                billboardGui.AlwaysOnTop = true
+
+                local textLabel = Instance.new("TextLabel")
+                textLabel.Parent = billboardGui
+                textLabel.Size = UDim2.new(1, 0, 1, 0)
+                textLabel.BackgroundTransparency = 1
+                textLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+                textLabel.TextStrokeTransparency = 0.8
+                textLabel.TextStrokeColor3 = Color3.fromRGB(0, 0, 0)
+                textLabel.TextSize = 14
+                textLabel.Text = player.Name .. "\n" .. tostring((game.Players.LocalPlayer.Character.HumanoidRootPart.Position - player.Character.HumanoidRootPart.Position).Magnitude) .. " studs"
+
+                -- Atualizar a distância dinamicamente
+                spawn(function()
+                    while espActive do
+                        if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+                            local distance = (game.Players.LocalPlayer.Character.HumanoidRootPart.Position - player.Character.HumanoidRootPart.Position).Magnitude
+                            textLabel.Text = player.Name .. "\n" .. math.floor(distance) .. " studs"
+                        end
+                        wait(0.1)  -- Atualiza a cada 0.1 segundos
+                    end
+                end)
+
+                table.insert(espElements, {player = player, billboardGui = billboardGui})
+            end
+        end
+    end
+})
+
+-- Desativar ESP
+Tabs.Troll:AddButton({
+    Title = "Desativar ESP ❌",
+    Description = "Desativa o ESP!",
+    Callback = function()
+        espActive = false
+        for _, element in ipairs(espElements) do
+            if element.billboardGui then
+                element.billboardGui:Destroy()
+            end
+        end
+        espElements = {}  -- Limpa a tabela de elementos de ESP
+    end
+})
+
+-----------------------------------------------------------
+-- ⚡ Hacks (Velocidade + Pulo Infinito + Atravessar Paredes)
+-----------------------------------------------------------
+local speedActive = false
+local jumpActive = false
+local wallWalkActive = false
+
+Tabs.Hacks:AddSection("Superpoderes!")
+
+-- Velocidade infinita
+Tabs.Hacks:AddButton({
+    Title = "Ativar Super Velocidade ⚡",
+    Description = "Corre mais rápido que o Flash!",
+    Callback = function()
+        speedActive = true
+        game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = 100
+    end
+})
+
+-- Desativar Velocidade
+Tabs.Hacks:AddButton({
+    Title = "Desativar Velocidade ❌",
+    Description = "Desativa a Super Velocidade!",
+    Callback = function()
+        speedActive = false
+        game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = 16
+    end
+})
+
+-- Pulo infinito
+Tabs.Hacks:AddButton({
+    Title = "Ativar Pulo Infinito 🦘",
+    Description = "Pule o quanto quiser sem limites!",
+    Callback = function()
+        jumpActive = true
+        game:GetService("UserInputService").JumpRequest:Connect(function()
+            game.Players.LocalPlayer.Character.Humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
+        end)
+    end
+})
+
+-- Desativar Pulo Infinito
+Tabs.Hacks:AddButton({
+    Title = "Desativar Pulo Infinito ❌",
+    Description = "Desativa o Pulo Infinito!",
+    Callback = function()
+        jumpActive = false
+        -- Desconectar a função de pulo infinito
+        game:GetService("UserInputService").JumpRequest:Disconnect()
+    end
+})
+
+-- Atravessar Paredes
+Tabs.Hacks:AddButton({
+    Title = "Ativar Atravessar Paredes 🚪",
+    Description = "Agora você pode atravessar as paredes!",
+    Callback = function()
+        wallWalkActive = true
+        local player = game.Players.LocalPlayer
+        local character = player.Character
+        local humanoid = character:WaitForChild("Humanoid")
+
+        local function enableWallWalk()
+            for _, part in pairs(character:GetChildren()) do
+                if part:IsA("BasePart") then
+                    part.CanCollide = false
                 end
             end
+        end
 
-        end)
+        enableWallWalk()
+        game:GetService("StarterGui"):SetCore("SendNotification", {
+            Title = "Poder Ativado!",
+            Text = "Você agora pode atravessar paredes! 🚪",
+            Duration = 5
+        })
+    end
+})
+
+-- Desativar Atravessar Paredes
+Tabs.Hacks:AddButton({
+    Title = "Desativar Atravessar Paredes ❌",
+    Description = "Desativa o poder de atravessar paredes!",
+    Callback = function()
+        wallWalkActive = false
+        local player = game.Players.LocalPlayer
+        local character = player.Character
+
+        local function disableWallWalk()
+            for _, part in pairs(character:GetChildren()) do
+                if part:IsA("BasePart") then
+                    part.CanCollide = true
+                end
+            end
         end
-        end
-        end
-end)
+
+        disableWallWalk()
+        game:GetService("StarterGui"):SetCore("SendNotification", {
+            Title = "Poder Desativado",
+            Text = "Você não pode mais atravessar paredes.",
+            Duration = 5
+        })
+    end
+})
+
+-- Adicionando o script de voo
+Tabs.Hacks:AddButton({
+    Title = "Ativar Voo 🕊️",
+    Description = "Voar pelo mapa!",
+    Callback = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/mikeexc/Dsc-Mike-Fly-Gui/main/Fly%20Gui"))()
+    end
+})
+
+-----------------------------------------------------------
+-- ℹ️ Sobre
+-----------------------------------------------------------
+Tabs.About:AddSection("Criado por Shelby, user discord: snobodj")
+Tabs.About:AddParagraph("Criado por Troll Hub para bagunçar no Brookhaven RP!")
+Tabs.About:AddParagraph("Aproveite e divirta-se, mas sem exagerar! 😆")
