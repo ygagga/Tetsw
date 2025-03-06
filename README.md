@@ -78,6 +78,24 @@ local function copiarSkin(jogadorAlvo)
     })
 end
 
+-- Função para matar o jogador (teleportando para o void)
+local function matarJogador()
+    if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
+        LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(-212, -499, -627)
+        Window:Notify({
+            Title = "Jogador Eliminado!",
+            Description = "Você teleportou o jogador para o void.",
+            Duration = 5
+        })
+    else
+        Window:Notify({
+            Title = "Erro!",
+            Description = "Não foi possível matar o jogador.",
+            Duration = 5
+        })
+    end
+end
+
 -- Adicionar input para selecionar jogador
 Window:AddInput({
     Title = "Nome do Jogador",
@@ -116,5 +134,15 @@ Window:AddButton({
                 Duration = 5
             })
         end
+    end
+})
+
+-- Adicionar botão para matar o jogador
+Window:AddButton({
+    Title = "Matar Jogador",
+    Description = "Teleporta o jogador para o void",
+    Tab = TrollTab,
+    Callback = function()
+        matarJogador()
     end
 })
