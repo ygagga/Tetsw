@@ -1,148 +1,74 @@
--- Carregar bibliotecas
+-- Carregar bibliotecas Fluent
 local Fluent = loadstring(game:HttpGet("https://github.com/dawid-scripts/Fluent/releases/latest/download/main.lua"))()
 local SaveManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Addons/SaveManager.lua"))()
 local InterfaceManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Addons/InterfaceManager.lua"))()
 
--- Criar interface
+-- Criar janela Fluent
 local Window = Fluent:CreateWindow({
-    Title = "Brookhaven RP - Troll Hub 🤡",
-    SubTitle = "🔥 Zoando geral!",
+    Title = "Script de Kill - Brookhaven",
+    SubTitle = "by ChatGPT",
     TabWidth = 160,
-    Size = UDim2.fromOffset(500, 320),
+    Size = UDim2.new(0, 500, 0, 400),
     Acrylic = true,
-    Theme = "Dark",
-    MinimizeKey = Enum.KeyCode.LeftControl
+    Theme = "Dark"
 })
 
-local TrollTab = Window:AddTab({ Title = "🤡 Troll", Icon = "alert" })
+-- Criar aba Trool
+local Main = Window:AddTab({ Title = "Troll", Icon = "rbxassetid://4483345998" })
 
-local LocalPlayer = game.Players.LocalPlayer
-local selectedPlayer = nil
+-- Variáveis de jogo
+local playerService = game:GetService("Players")
+local runService = game:GetService("RunService")
+local player = playerService.LocalPlayer
+local jogadorSelecionado = nil
+local listaJogadores = {}
 
--- Função para encontrar um jogador pelo nome
-local function encontrarJogador(nome)
-    for _, jogador in ipairs(game.Players:GetPlayers()) do
-        if string.lower(jogador.Name) == string.lower(nome) then
-            return jogador
-        end
+-- Função para atualizar a lista de jogadores
+local function atualizarLista()
+    listaJogadores = {}
+    for _, v in pairs(playerService:GetPlayers()) do
+        table.insert(listaJogadores, v.Name)
     end
-    return nil
+    return listaJogadores
 end
 
--- Função para copiar a skin do jogador
-local function copiarSkin(jogadorAlvo)
-    local targetCharacter = jogadorAlvo.Character
-    local localCharacter = LocalPlayer.Character
-
-    if not targetCharacter or not localCharacter then
-        Window:Notify({
-            Title = "Erro",
-            Description = "Personagem não encontrado!",
-            Duration = 5
-        })
-        return
-    end
-
-    -- Remove as roupas atuais do jogador local
-    for _, item in ipairs(localCharacter:GetChildren()) do
-        if item:IsA("Accessory") or item:IsA("Shirt") or item:IsA("Pants") or item:IsA("ShirtGraphic") then
-            item:Destroy()
+-- Função para teleportar jogador para o void
+local function teleportToVoid()
+    if jogadorSelecionado and jogadorSelecionado.Character then
+        local targetHRP = jogadorSelecionado.Character:FindFirstChild("HumanoidRootPart")
+        if targetHRP then
+            targetHRP.CFrame = CFrame.new(-212, -499, -627) -- Local do void
         end
-    end
-
-    -- Copia as roupas e acessórios do jogador alvo
-    for _, item in ipairs(targetCharacter:GetChildren()) do
-        if item:IsA("Accessory") or item:IsA("Shirt") or item:IsA("Pants") or item:IsA("ShirtGraphic") then
-            local clone = item:Clone()
-            clone.Parent = localCharacter
-        end
-    end
-
-    -- Copia a cor do corpo (skin)
-    local targetBodyColors = targetCharacter:FindFirstChild("Body Colors")
-    local localBodyColors = localCharacter:FindFirstChild("Body Colors")
-
-    if targetBodyColors and localBodyColors then
-        localBodyColors.HeadColor = targetBodyColors.HeadColor
-        localBodyColors.LeftArmColor = targetBodyColors.LeftArmColor
-        localBodyColors.RightArmColor = targetBodyColors.RightArmColor
-        localBodyColors.LeftLegColor = targetBodyColors.LeftLegColor
-        localBodyColors.RightLegColor = targetBodyColors.RightLegColor
-        localBodyColors.TorsoColor = targetBodyColors.TorsoColor
-    end
-
-    Window:Notify({
-        Title = "Sucesso!",
-        Description = "Skin copiada de " .. jogadorAlvo.Name .. "!",
-        Duration = 5
-    })
-end
-
--- Função para matar o jogador (teleportando para o void)
-local function matarJogador()
-    if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
-        LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(-212, -499, -627)
-        Window:Notify({
-            Title = "Jogador Eliminado!",
-            Description = "Você teleportou o jogador para o void.",
-            Duration = 5
-        })
-    else
-        Window:Notify({
-            Title = "Erro!",
-            Description = "Não foi possível matar o jogador.",
-            Duration = 5
-        })
     end
 end
 
--- Adicionar input para selecionar jogador
-Window:AddInput({
-    Title = "Nome do Jogador",
-    Description = "Digite o nome exato",
-    Tab = TrollTab,
+-- Criar dropdown de seleção de jogador
+Window:AddDropdown({
+    Title = "Selecione um Jogador",
+    Values = atualizarLista(),
+    MultiSelection = false,
+    Tab = Main,
     Callback = function(value)
-        selectedPlayer = encontrarJogador(value)
-        if selectedPlayer then
+        jogadorSelecionado = playerService:FindFirstChild(value)
+        if jogadorSelecionado then
             Window:Notify({
                 Title = "Jogador Selecionado",
-                Description = "Jogador encontrado: " .. selectedPlayer.Name,
-                Duration = 5
-            })
-        else
-            Window:Notify({
-                Title = "Erro",
-                Description = "Nenhum jogador encontrado!",
+                Description = "Você escolheu: " .. jogadorSelecionado.Name,
                 Duration = 5
             })
         end
     end
 })
 
--- Adicionar botão para copiar a skin
-Window:AddButton({
-    Title = "Copiar Skin",
-    Description = "Rouba a skin do jogador selecionado",
-    Tab = TrollTab,
-    Callback = function()
-        if selectedPlayer then
-            copiarSkin(selectedPlayer)
-        else
-            Window:Notify({
-                Title = "Erro",
-                Description = "Nenhum jogador selecionado!",
-                Duration = 5
-            })
-        end
-    end
-})
+-- Atualizar a lista automaticamente quando um jogador entra ou sai
+playerService.PlayerAdded:Connect(function()
+    Window:UpdateDropdown({
+        Title = "Selecione um Jogador",
+        Values = atualizarLista(),
+    })
+end)
 
--- Adicionar botão para matar o jogador
-Window:AddButton({
-    Title = "Matar Jogador",
-    Description = "Teleporta o jogador para o void",
-    Tab = TrollTab,
-    Callback = function()
-        matarJogador()
-    end
-})
+playerService.PlayerRemoving:Connect(function()
+    Window:UpdateDropdown({
+
+       
