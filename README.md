@@ -45,6 +45,7 @@ local Tabs = {
     Avatar = Window:AddTab({ Title = "👤 Avatar", Icon = "shirt" }),
     Troll = Window:AddTab({ Title = "🤡 Troll", Icon = "alert" }),
     Hacks = Window:AddTab({ Title = "⚡ Hacks", Icon = "zap" }),
+    Scipts = Window:AddTab({ Title = "☢️Scipts universais", Icon = "zap" }),
     About = Window:AddTab({ Title = "ℹ️ Sobre", Icon = "info" })
 }
 
@@ -264,6 +265,40 @@ Tabs.Hacks:AddButton({
         loadstring(game:HttpGet("https://raw.githubusercontent.com/mikeexc/Dsc-Mike-Fly-Gui/main/Fly%20Gui"))()
     end
 })
+
+
+--☢️ Scripts universais
+
+Tabs.Scripts:AddSection("Scripts Universais abaixo ☟")
+
+-- Adicionando o script de voo
+Tabs.Scripts:AddButton({
+    Title = "Fly gui V3🕊️",
+    Description = "Voar pelo mapa!",
+    Callback = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/XNEOFF/FlyGuiV3/main/FlyGuiV3.txt"))()
+    end
+})
+
+-- Adicionando o script Rael Hub
+Tabs.Scripts:AddButton({
+    Title = "Rael hub",
+    Description = "Mandrakes👍",
+    Callback = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/Laelmano24/Rael-Hub/refs/heads/main/Universal/script.txt"))()
+    end
+})
+
+-- Adicionando o script Mango Hub
+Tabs.Scripts:AddButton({
+    Title = "Mango hub",
+    Description = "🥭",
+    Callback = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/rogelioajax/lua/main/MangoHub", true))()
+    end
+})
+
+
 
 -----------------------------------------------------------
 -- ℹ️ Sobre
