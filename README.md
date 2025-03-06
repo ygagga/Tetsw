@@ -1,74 +1,248 @@
--- Carregar bibliotecas Fluent
+-- Carrega as bibliotecas Fluent, SaveManager e InterfaceManager
 local Fluent = loadstring(game:HttpGet("https://github.com/dawid-scripts/Fluent/releases/latest/download/main.lua"))()
 local SaveManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Addons/SaveManager.lua"))()
 local InterfaceManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Addons/InterfaceManager.lua"))()
 
--- Criar janela Fluent
+-- Criando a Janela da Interface
 local Window = Fluent:CreateWindow({
-    Title = "Script de Kill - Brookhaven",
-    SubTitle = "by ChatGPT",
+    Title = "Brookhaven RP 🏡 (Troll Hub 🤡)",
+    SubTitle = "🔥 Zoando geral! 💀",
     TabWidth = 160,
-    Size = UDim2.new(0, 500, 0, 400),
+    Size = UDim2.fromOffset(500, 320),
     Acrylic = true,
-    Theme = "Dark"
+    Theme = "Dark",
+    MinimizeKey = Enum.KeyCode.LeftControl
 })
 
--- Criar aba Trool
-local Main = Window:AddTab({ Title = "Troll", Icon = "rbxassetid://4483345998" })
+-- Função para trocar a cabeça do avatar
+local function changeAvatar(id, notificationTitle)
+    local argsTable = (type(id) == "table") and id or {1, 1, 1, 1, 1, id}
 
--- Variáveis de jogo
-local playerService = game:GetService("Players")
-local runService = game:GetService("RunService")
-local player = playerService.LocalPlayer
-local jogadorSelecionado = nil
-local listaJogadores = {}
+    local args = {
+        [1] = "CharacterChange",
+        [2] = argsTable,
+        [3] = "🔥 Troll Hub 💀"
+    }
 
--- Função para atualizar a lista de jogadores
-local function atualizarLista()
-    listaJogadores = {}
-    for _, v in pairs(playerService:GetPlayers()) do
-        table.insert(listaJogadores, v.Name)
-    end
-    return listaJogadores
-end
+    local replicatedStorage = game:GetService("ReplicatedStorage")
+    local starterGui = game:GetService("StarterGui")
 
--- Função para teleportar jogador para o void
-local function teleportToVoid()
-    if jogadorSelecionado and jogadorSelecionado.Character then
-        local targetHRP = jogadorSelecionado.Character:FindFirstChild("HumanoidRootPart")
-        if targetHRP then
-            targetHRP.CFrame = CFrame.new(-212, -499, -627) -- Local do void
-        end
-    end
-end
-
--- Criar dropdown de seleção de jogador
-Window:AddDropdown({
-    Title = "Selecione um Jogador",
-    Values = atualizarLista(),
-    MultiSelection = false,
-    Tab = Main,
-    Callback = function(value)
-        jogadorSelecionado = playerService:FindFirstChild(value)
-        if jogadorSelecionado then
-            Window:Notify({
-                Title = "Jogador Selecionado",
-                Description = "Você escolheu: " .. jogadorSelecionado.Name,
+    if replicatedStorage and starterGui then
+        local remote = replicatedStorage.RE:FindFirstChild("1Avata1rOrigina1l")
+        if remote then
+            remote:FireServer(unpack(args))
+            starterGui:SetCore("SendNotification", {
+                Title = notificationTitle,
+                Text = "Aguarde 1-10 segundos...",
                 Duration = 5
             })
         end
     end
+end
+
+-- Criando Abas
+local Tabs = {
+    Avatar = Window:AddTab({ Title = "👤 Avatar", Icon = "shirt" }),
+    Troll = Window:AddTab({ Title = "🤡 Troll", Icon = "alert" }),
+    Hacks = Window:AddTab({ Title = "⚡ Hacks", Icon = "zap" }),
+    About = Window:AddTab({ Title = "ℹ️ Sobre", Icon = "info" })
+}
+
+-----------------------------------------------------------
+-- 👤 Avatar
+-----------------------------------------------------------
+Tabs.Avatar:AddSection("Trocar Cabeça")
+
+Tabs.Avatar:AddInput("Head ID", {
+    Title = "Digite o ID da Cabeça",
+    Default = "",
+    Placeholder = "ID",
+    Numeric = true,
+    Finished = true,
+    Callback = function(s)
+        changeAvatar(tonumber(s), "Carregando...")
+        wait(1)
+        game:GetService("StarterGui"):SetCore("SendNotification", {
+            Title = "Pronto!",
+            Text = "Cabeça alterada com sucesso ✅",
+            Duration = 3
+        })
+    end
 })
 
--- Atualizar a lista automaticamente quando um jogador entra ou sai
-playerService.PlayerAdded:Connect(function()
-    Window:UpdateDropdown({
-        Title = "Selecione um Jogador",
-        Values = atualizarLista(),
-    })
-end)
+Tabs.Avatar:AddButton({
+    Title = "Headless Horseman",
+    Description = "Cabeça invisível!",
+    Callback = function()
+        changeAvatar(134082579, "Headless Horseman Aplicado!")
+    end
+})
 
-playerService.PlayerRemoving:Connect(function()
-    Window:UpdateDropdown({
+Tabs.Avatar:AddButton({
+    Title = "Blaze Burner",
+    Description = "Cabeça flamejante 🔥",
+    Callback = function()
+        changeAvatar(3210773801, "Blaze Burner Aplicado!")
+    end
+})
 
-       
+-----------------------------------------------------------
+-- 🤡 Troll (ESP e Outros Trolls)
+-----------------------------------------------------------
+Tabs.Troll:AddSection("Trollando no servidor!")
+
+-- ESP (Nome do Jogador e Distância)
+local espActive = false
+local espElements = {}  -- Tabela para armazenar os elementos de ESP criados
+
+Tabs.Troll:AddButton({
+    Title = "Ativar ESP 🔍",
+    Description = "Veja o nome e distância dos jogadores!",
+    Callback = function()
+        espActive = true
+        for _, player in pairs(game.Players:GetPlayers()) do
+            if player.Character and player ~= game.Players.LocalPlayer then
+                local billboardGui = Instance.new("BillboardGui")
+                billboardGui.Parent = player.Character.Head
+                billboardGui.Adornee = player.Character.Head
+                billboardGui.Size = UDim2.new(0, 100, 0, 50)
+                billboardGui.StudsOffset = Vector3.new(0, 2, 0)
+                billboardGui.AlwaysOnTop = true
+
+                local textLabel = Instance.new("TextLabel")
+                textLabel.Parent = billboardGui
+                textLabel.Size = UDim2.new(1, 0, 1, 0)
+                textLabel.BackgroundTransparency = 1
+                textLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+                textLabel.TextStrokeTransparency = 0.8
+                textLabel.TextStrokeColor3 = Color3.fromRGB(0, 0, 0)
+                textLabel.TextSize = 14
+                textLabel.Text = player.Name .. "\n" .. tostring((game.Players.LocalPlayer.Character.HumanoidRootPart.Position - player.Character.HumanoidRootPart.Position).Magnitude) .. " studs"
+
+                -- Atualizar a distância dinamicamente
+                spawn(function()
+                    while espActive do
+                        if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+                            local distance = (game.Players.LocalPlayer.Character.HumanoidRootPart.Position - player.Character.HumanoidRootPart.Position).Magnitude
+                            textLabel.Text = player.Name .. "\n" .. math.floor(distance) .. " studs"
+                        end
+                        wait(0.1)  -- Atualiza a cada 0.1 segundos
+                    end
+                end)
+
+                table.insert(espElements, {player = player, billboardGui = billboardGui})
+            end
+        end
+    end
+})
+
+-- Desativar ESP
+Tabs.Troll:AddButton({
+    Title = "Desativar ESP ❌",
+    Description = "Desativa o ESP!",
+    Callback = function()
+        espActive = false
+        for _, element in ipairs(espElements) do
+            if element.billboardGui then
+                element.billboardGui:Destroy()
+            end
+        end
+        espElements = {}  -- Limpa a tabela de elementos de ESP
+    end
+})
+
+-- Lançar Jogadores para o Alto
+Tabs.Troll:AddButton({
+    Title = "Lançar Jogadores",
+    Description = "Joga todos os jogadores para o alto!",
+    Callback = function()
+        for _, player in pairs(game.Players:GetPlayers()) do
+            if player ~= game.Players.LocalPlayer and player.Character then
+                player.Character.HumanoidRootPart.Velocity = Vector3.new(0, 500, 0)
+            end
+        end
+    end
+})
+
+-- Reduzir Velocidade dos Jogadores
+Tabs.Troll:AddButton({
+    Title = "Reduzir Velocidade",
+    Description = "Diminui a velocidade de todos os jogadores!",
+    Callback = function()
+        for _, player in pairs(game.Players:GetPlayers()) do
+            if player ~= game.Players.LocalPlayer and player.Character then
+                player.Character.Humanoid.WalkSpeed = 5 -- Velocidade reduzida
+            end
+        end
+    end
+})
+
+-- Restaurar Velocidade dos Jogadores
+Tabs.Troll:AddButton({
+    Title = "Restaurar Velocidade",
+    Description = "Volta a velocidade normal dos jogadores!",
+    Callback = function()
+        for _, player in pairs(game.Players:GetPlayers()) do
+            if player ~= game.Players.LocalPlayer and player.Character then
+                player.Character.Humanoid.WalkSpeed = 16 -- Velocidade padrão
+            end
+        end
+    end
+})
+
+-----------------------------------------------------------
+-- ⚡ Hacks (Velocidade + Pulo Infinito + Atravessar Paredes)
+-----------------------------------------------------------
+local speedActive = false
+local jumpActive = false
+local wallWalkActive = false
+
+Tabs.Hacks:AddSection("Superpoderes!")
+
+-- Velocidade infinita
+Tabs.Hacks:AddButton({
+    Title = "Ativar Super Velocidade ⚡",
+    Description = "Corre mais rápido que o Flash!",
+    Callback = function()
+        speedActive = true
+        game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = 100
+    end
+})
+
+-- Desativar Velocidade
+Tabs.Hacks:AddButton({
+    Title = "Desativar Velocidade ❌",
+    Description = "Desativa a Super Velocidade!",
+    Callback = function()
+        speedActive = false
+        game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = 16
+    end
+})
+
+-- Pulo infinito
+Tabs.Hacks:AddButton({
+    Title = "Ativar Pulo Infinito 🦘",
+    Description = "Pule o quanto quiser sem limites!",
+    Callback = function()
+        jumpActive = true
+        game:GetService("UserInputService").JumpRequest:Connect(function()
+            game.Players.LocalPlayer.Character.Humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
+        end)
+    end
+})
+
+-- Desativar Pulo Infinito
+Tabs.Hacks:AddButton({
+    Title = "Desativar Pulo Infinito ❌",
+    Description = "Desativa o Pulo Infinito!",
+    Callback = function()
+        jumpActive = false
+        -- Desconectar a função de pulo infinito
+        game:GetService("UserInputService").JumpRequest:Disconnect()
+    end
+})
+
+-- Atravessar Paredes
+Tabs.Hacks:AddButton({
+    Title = "Ativar Atravessar Paredes 🚪",
+    Description = "Agora você pode atravessar as paredes
