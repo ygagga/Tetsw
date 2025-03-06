@@ -16,96 +16,79 @@ local Window = Fluent:CreateWindow({
 
 local TrollTab = Window:AddTab({ Title = "🤡 Troll", Icon = "alert" })
 
--- Variáveis de serviços
-local Players = game:GetService("Players")
-local RunService = game:GetService("RunService")
-local LocalPlayer = Players.LocalPlayer
+local LocalPlayer = game.Players.LocalPlayer
+local selectedPlayer = nil
 
-local jogadorSelecionado = nil
-local playerNameInput = nil
-
--- Função para buscar jogadores pelo nome
-local function gplr(String)
-    local strl = String:lower()
-    for _, v in pairs(Players:GetPlayers()) do
-        if v.Name:lower():sub(1, #strl) == strl then
-            return v
+-- Função para encontrar um jogador pelo nome
+local function encontrarJogador(nome)
+    for _, jogador in ipairs(game.Players:GetPlayers()) do
+        if string.lower(jogador.Name) == string.lower(nome) then
+            return jogador
         end
     end
     return nil
 end
 
--- Função para visualizar o jogador
-local function spectatePlayer(player)
-    local camera = workspace.CurrentCamera
-    if player and player.Character then
-        camera.CameraSubject = player.Character
-        Window:Notify({
-            Title = "Visualizando Jogador",
-            Description = "Você está visualizando " .. player.Name,
-            Duration = 5
-        })
-    else
-        camera.CameraSubject = LocalPlayer.Character
-        Window:Notify({
-            Title = "Visualização Desativada",
-            Description = "Você voltou a visualizar seu personagem",
-            Duration = 5
-        })
-    end
-end
+-- Função para copiar a skin do jogador
+local function copiarSkin(jogadorAlvo)
+    local targetCharacter = jogadorAlvo.Character
+    local localCharacter = LocalPlayer.Character
 
--- Função para matar jogador usando o sofá
-local function killPlayer(target)
-    if not target or not target.Character then
+    if not targetCharacter or not localCharacter then
         Window:Notify({
             Title = "Erro",
-            Description = "Jogador inválido!",
+            Description = "Personagem não encontrado!",
             Duration = 5
         })
         return
     end
 
-    -- Spawnar sofá na mão do jogador
-    local args = {
-        [1] = "VehicleSpawn",
-        [2] = "HouseSofa",
-        [3] = LocalPlayer
-    }
-    game:GetService("ReplicatedStorage").RE:FindFirstChild("1Car"):FireServer(unpack(args))
+    -- Remove as roupas atuais do jogador local
+    for _, item in ipairs(localCharacter:GetChildren()) do
+        if item:IsA("Accessory") or item:IsA("Shirt") or item:IsA("Pants") or item:IsA("ShirtGraphic") then
+            item:Destroy()
+        end
+    end
 
-    wait(1)  -- Tempo para garantir que o sofá spawnou
+    -- Copia as roupas e acessórios do jogador alvo
+    for _, item in ipairs(targetCharacter:GetChildren()) do
+        if item:IsA("Accessory") or item:IsA("Shirt") or item:IsA("Pants") or item:IsA("ShirtGraphic") then
+            local clone = item:Clone()
+            clone.Parent = localCharacter
+        end
+    end
 
-    -- Pegar o jogador com o sofá e teleportar para o void
-    LocalPlayer.Character.HumanoidRootPart.CFrame = target.Character.HumanoidRootPart.CFrame
-    wait(0.5)
-    target.Character.HumanoidRootPart.CFrame = CFrame.new(0, -500, 0) -- Void
+    -- Copia a cor do corpo (skin)
+    local targetBodyColors = targetCharacter:FindFirstChild("Body Colors")
+    local localBodyColors = localCharacter:FindFirstChild("Body Colors")
 
-    wait(1)
-
-    -- Voltar para posição original
-    LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(0, 10, 0)
+    if targetBodyColors and localBodyColors then
+        localBodyColors.HeadColor = targetBodyColors.HeadColor
+        localBodyColors.LeftArmColor = targetBodyColors.LeftArmColor
+        localBodyColors.RightArmColor = targetBodyColors.RightArmColor
+        localBodyColors.LeftLegColor = targetBodyColors.LeftLegColor
+        localBodyColors.RightLegColor = targetBodyColors.RightLegColor
+        localBodyColors.TorsoColor = targetBodyColors.TorsoColor
+    end
 
     Window:Notify({
-        Title = "Jogador Eliminado!",
-        Description = "O jogador " .. target.Name .. " foi enviado para o void!",
+        Title = "Sucesso!",
+        Description = "Skin copiada de " .. jogadorAlvo.Name .. "!",
         Duration = 5
     })
 end
 
--- Input para selecionar o jogador
-TrollTab:AddInput("player_select", {
+-- Adicionar input para selecionar jogador
+Window:AddInput({
     Title = "Nome do Jogador",
-    Description = "Digite pelo menos 3 letras",
-    Placeholder = "Nome",
-    Numeric = false,
-    Finished = true,
+    Description = "Digite o nome exato",
+    Tab = TrollTab,
     Callback = function(value)
-        jogadorSelecionado = gplr(value)
-        if jogadorSelecionado then
+        selectedPlayer = encontrarJogador(value)
+        if selectedPlayer then
             Window:Notify({
                 Title = "Jogador Selecionado",
-                Description = "Você selecionou: " .. jogadorSelecionado.Name,
+                Description = "Jogador encontrado: " .. selectedPlayer.Name,
                 Duration = 5
             })
         else
@@ -118,22 +101,14 @@ TrollTab:AddInput("player_select", {
     end
 })
 
--- Botão para visualizar o jogador
-TrollTab:AddToggle({
-    Title = "Visualizar Jogador",
-    Description = "Foca a câmera no jogador selecionado",
-    Callback = function(state)
-        spectatePlayer(state and jogadorSelecionado or nil)
-    end
-})
-
--- Botão para matar o jogador
-TrollTab:AddButton({
-    Title = "Matar Jogador",
-    Description = "Manda o jogador selecionado para o void!",
+-- Adicionar botão para copiar a skin
+Window:AddButton({
+    Title = "Copiar Skin",
+    Description = "Rouba a skin do jogador selecionado",
+    Tab = TrollTab,
     Callback = function()
-        if jogadorSelecionado then
-            killPlayer(jogadorSelecionado)
+        if selectedPlayer then
+            copiarSkin(selectedPlayer)
         else
             Window:Notify({
                 Title = "Erro",
