@@ -45,7 +45,7 @@ local Tabs = {
     Avatar = Window:AddTab({ Title = "👤 Avatar", Icon = "shirt" }),
     Troll = Window:AddTab({ Title = "🤡 Troll", Icon = "alert" }),
     Hacks = Window:AddTab({ Title = "⚡ Hacks", Icon = "zap" }),
-    Scipts = Window:AddTab({ Title = "☢️Scipts universais", Icon = "zap" }),
+    Scipts = Window:AddTab({ Title = "☢️Scipts universais", Icon = "icon-check" }),
     About = Window:AddTab({ Title = "ℹ️ Sobre", Icon = "info" })
 }
 
@@ -267,7 +267,9 @@ Tabs.Hacks:AddButton({
 })
 
 
---☢️ Scripts universais
+-----------------------------------------------------------
+-- ☢️ Scipts universais
+-----------------------------------------------------------
 
 Tabs.Scripts:AddSection("Scripts Universais abaixo ☟")
 
@@ -297,7 +299,6 @@ Tabs.Scripts:AddButton({
         loadstring(game:HttpGet("https://raw.githubusercontent.com/rogelioajax/lua/main/MangoHub", true))()
     end
 })
-
 
 
 -----------------------------------------------------------
