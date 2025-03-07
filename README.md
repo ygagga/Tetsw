@@ -142,19 +142,19 @@ Tabs.Troll:AddButton({
     end
 })
 
-local antiSitEnabled = true  -- Variável para controlar o estado do Anti-Sit
 
--- Função para ativar o Anti-Sit
+local antiSitEnabled = true  -- Variável para controlar o estado do Anti-Sit (apenas para você)
+
+-- Função para ativar o Anti-Sit para o seu jogador
 local function antiSit()
-    game:GetService("Players").PlayerAdded:Connect(function(player)
-        player.CharacterAdded:Connect(function(character)
-            local humanoid = character:WaitForChild("Humanoid")
-            humanoid.Seated:Connect(function(_, seat)
-                if antiSitEnabled and seat then
-                    -- Cancela a ação de sentar se o Anti-Sit estiver ativado
-                    humanoid.Sit = false
-                end
-            end)
+    local player = game:GetService("Players").LocalPlayer
+    player.CharacterAdded:Connect(function(character)
+        local humanoid = character:WaitForChild("Humanoid")
+        humanoid.Seated:Connect(function(_, seat)
+            if antiSitEnabled and seat then
+                -- Cancela a ação de sentar se o Anti-Sit estiver ativado
+                humanoid.Sit = false
+            end
         end)
     end)
 end
@@ -169,26 +169,26 @@ antiSit()
 
 -- Adiciona os botões na aba Troll
 Tabs.Troll:AddButton({
-    Title = "Ativar Anti-Sit",
-    Description = "Impedir que os jogadores se sentem em qualquer lugar",
+    Title = "Ativar Anti-Sit (Para Você)",
+    Description = "Impedir que você se sente em qualquer lugar",
     Callback = function()
         antiSitEnabled = true
         Window:Notify({
             Title = "Anti-Sit Ativado",
-            Description = "Os jogadores não poderão mais se sentar.",
+            Description = "Você não poderá mais se sentar.",
             Duration = 5
         })
     end
 })
 
 Tabs.Troll:AddButton({
-    Title = "Desativar Anti-Sit",
-    Description = "Permite que os jogadores se sentem novamente.",
+    Title = "Desativar Anti-Sit (Para Você)",
+    Description = "Permitir que você se sente novamente",
     Callback = function()
         disableAntiSit()
         Window:Notify({
             Title = "Anti-Sit Desativado",
-            Description = "Os jogadores podem se sentar normalmente agora.",
+            Description = "Você pode se sentar novamente.",
             Duration = 5
         })
     end
