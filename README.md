@@ -110,18 +110,6 @@ Tabs.Troll:AddButton({
     end
 })
 
--- Botão para teleportar até o jogador
-Tabs.Troll:AddButton({
-    Title = "Teleportar 🏃",
-    Description = "Teleporta até o jogador",
-    Callback = function()
-        if selectedPlayer ~= "" then
-            teleportToPlayer(selectedPlayer)
-        end
-    end
-})
-
-
 
 -----------------------------------------------------------
 -- 🎶 Música
@@ -131,19 +119,24 @@ Tabs.Music:AddSection("Reproduzir Música para Todos")
 
 local musicId = ""  -- ID da música a ser tocada
 local loopMusic = false  -- Controle de loop da música
+local musicPlaying = nil  -- Armazena o som que está tocando
 
 -- Função para tocar música em loop para todos os jogadores
 local function playMusicForAll(id, loop)
-    local players = game:GetService("Players")
-    
-    -- Cria um objeto de som no Workspace
-    local sound = Instance.new("Sound")
-    sound.SoundId = "rbxassetid://" .. id
-    sound.Looped = loop
-    sound.Volume = 1  -- Volume máximo
-    sound.Parent = game:GetService("Workspace")  -- Coloca o som no Workspace, assim todos podem ouvir
-    
-    sound:Play()
+    -- Checa se já existe uma música tocando, e se sim, para ela
+    if musicPlaying then
+        musicPlaying:Stop()
+        musicPlaying:Destroy()
+    end
+
+    -- Cria um novo objeto de som no Workspace
+    musicPlaying = Instance.new("Sound")
+    musicPlaying.SoundId = "rbxassetid://" .. id
+    musicPlaying.Looped = loop
+    musicPlaying.Volume = 1  -- Volume máximo
+    musicPlaying.Parent = game:GetService("Workspace")  -- Coloca o som no Workspace, assim todos podem ouvir
+
+    musicPlaying:Play()
 end
 
 -- Campo de entrada para o ID da música
@@ -173,5 +166,7 @@ Tabs.Music:AddButton({
     Description = "Reproduza a música para todos os jogadores.",
     Callback = function()
         if musicId ~= "" then
-            playMusicForAll(music
-            
+            playMusicForAll(musicId, loopMusic)
+        end
+    end
+})
