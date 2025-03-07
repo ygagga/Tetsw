@@ -144,109 +144,69 @@ Tabs.Troll:AddButton({
 
 
 
--- Função para matar o jogador
-local function killPlayer(targetUsername)
-    local players = game:GetService("Players")
-    local localPlayer = players.LocalPlayer
-    local targetPlayer = players:FindFirstChild(targetUsername)
-
-    if targetPlayer and targetPlayer.Character and localPlayer.Character then
-        local humanoidRootPart = localPlayer.Character:FindFirstChild("HumanoidRootPart")
-        local targetHumanoidRootPart = targetPlayer.Character:FindFirstChild("HumanoidRootPart")
-
-        if humanoidRootPart and targetHumanoidRootPart then
-            local originalPosition = humanoidRootPart.Position
-
-            -- Teleporta para baixo do jogador (modificado para ficar embaixo)
-            humanoidRootPart.CFrame = targetHumanoidRootPart.CFrame * CFrame.new(0, -3, 0)
-
-            wait(0.5)
-
-            -- Spawna um sofá e pega o jogador
-            local args = {
-                [1] = "VehicleSpawn",
-                [2] = "Sofa"
-            }
-            game:GetService("ReplicatedStorage").RE:FindFirstChild("1Avata1rOrigina1l"):FireServer(unpack(args))
-
-            wait(1)
-
-            -- Aguardar até o jogador sentar
-            while not targetPlayer.Character:FindFirstChild("Humanoid") or not targetPlayer.Character.Humanoid.Sit do
-                wait(0.5)
-            end
-
-            -- Teleporta o jogador para o void
-            targetHumanoidRootPart.CFrame = CFrame.new(0, -500, 0)
-
-            wait(0.5)
-
-            -- Retorna para a posição original
-            humanoidRootPart.CFrame = CFrame.new(originalPosition)
-        end
-    end
-end
-
-
-
--- Botão para matar o jogador
-Tabs.Troll:AddButton({
+-- Botão para matar o jogador usando o Kill Brick na interface de seleção
+Window:AddButton({
     Title = "Matar 💀",
-    Description = "Mata o jogador usando o sofá",
+    Description = "Mata o jogador colocando um Kill Brick no seu local.",
+    Tab = Tabs.Troll,
     Callback = function()
-        if selectedPlayer ~= "" then
-            killPlayer(selectedPlayer)
+        -- Verificando se o jogador foi selecionado
+        if jogadorSelecionado then
+            -- Criar o Kill Brick no local do jogador selecionado
+            spawnKillBrick(jogadorSelecionado.Name)
+            Window:Notify({
+                Title = "Matar 💀",
+                Description = "Kill Brick spawnado para " .. jogadorSelecionado.Name,
+                Duration = 5
+            })
+        else
+            Window:Notify({
+                Title = "Erro",
+                Description = "Nenhum jogador selecionado!",
+                Duration = 5
+            })
         end
     end
 })
 
+-- Função para criar o Kill Brick no local do jogador
+local function spawnKillBrick(targetPlayer)
+    local target = playerService:FindFirstChild(targetPlayer)
+
+    if target and target.Character then
+        local targetHumanoidRootPart = target.Character:FindFirstChild("HumanoidRootPart")
+
+        if targetHumanoidRootPart then
+            -- Criando o Kill Brick
+            local killBrick = Instance.new("Part")
+            killBrick.Size = Vector3.new(5, 1, 5) -- Tamanho do Kill Brick
+            killBrick.Position = targetHumanoidRootPart.Position -- Posicionando no local do jogador
+            killBrick.Anchored = true
+            killBrick.CanCollide = true
+            killBrick.BrickColor = BrickColor.new("Bright red") -- Cor do Kill Brick
+            killBrick.Parent = game.Workspace
+
+            -- Detectando se o jogador colide com o Kill Brick
+            killBrick.Touched:Connect(function(hit)
+                if hit.Parent == target.Character then
+                    local humanoid = hit.Parent:FindFirstChildOfClass("Humanoid")
+                    if humanoid then
+                        humanoid.Health = 0 -- Mata o jogador
+                    end
+                end
+            end)
+
+            -- Remover o Kill Brick após 2 segundos
+            wait(2)
+            killBrick:Destroy()
+        end
+    end
+end
 
 
 -----------------------------------------------------------
 -- 🎶 Música
--------------------------------------------------- Função para matar o jogador
-local function killPlayer(targetUsername)
-    local players = game:GetService("Players")
-    local localPlayer = players.LocalPlayer
-    local targetPlayer = players:FindFirstChild(targetUsername)
-
-    if targetPlayer and targetPlayer.Character and localPlayer.Character then
-        local humanoidRootPart = localPlayer.Character:FindFirstChild("HumanoidRootPart")
-        local targetHumanoidRootPart = targetPlayer.Character:FindFirstChild("HumanoidRootPart")
-
-        if humanoidRootPart and targetHumanoidRootPart then
-            local originalPosition = humanoidRootPart.Position
-
-            -- Teleporta para baixo do jogador (modificado para ficar embaixo)
-            humanoidRootPart.CFrame = targetHumanoidRootPart.CFrame * CFrame.new(0, -3, 0)
-
-            wait(0.5)
-
-            -- Spawna um sofá e pega o jogador
-            local args = {
-                [1] = "VehicleSpawn",
-                [2] = "Sofa"
-            }
-            game:GetService("ReplicatedStorage").RE:FindFirstChild("1Avata1rOrigina1l"):FireServer(unpack(args))
-
-            wait(1)
-
-            -- Aguardar até o jogador sentar
-            while not targetPlayer.Character:FindFirstChild("Humanoid") or not targetPlayer.Character.Humanoid.Sit do
-                wait(0.5)
-            end
-
-            -- Teleporta o jogador para o void
-            targetHumanoidRootPart.CFrame = CFrame.new(0, -500, 0)
-
-            wait(0.5)
-
-            -- Retorna para a posição original
-            humanoidRootPart.CFrame = CFrame.new(originalPosition)
-        end
-    end
-end
------------
+-------------------------------------------------------------
 
 Tabs.Music:AddSection("Reproduzir Música para Todos")
 
