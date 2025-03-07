@@ -45,7 +45,7 @@ local Tabs = {
     Avatar = Window:AddTab({ Title = "👤 Avatar", Icon = "shirt" }),
     Troll = Window:AddTab({ Title = "🤡 Troll", Icon = "alert" }),
     Hacks = Window:AddTab({ Title = "⚡ Hacks", Icon = "zap" }),
-    local ScriptsTab = Window:AddTab({ Title = "☢️ Scripts Universais", Icon = "zap" })
+    Scipts = Window:AddTab({ Title = "👾 Scipts universais", Icon = "alert" })
     About = Window:AddTab({ Title = "ℹ️ Sobre", Icon = "info" })
 }
 
@@ -54,7 +54,7 @@ local Tabs = {
 -----------------------------------------------------------
 Tabs.Avatar:AddSection("Trocar Cabeça")
 
-Tabs.Avatar:AddInput("Head ID", {
+Tabs.Avatar:AddInput("Head ID", 
     Title = "Digite o ID da Cabeça",
     Default = "",
     Placeholder = "ID",
@@ -270,9 +270,9 @@ Tabs.Hacks:AddButton({
 -----------------------------------------------------------
 -- ☢️ Scipts universais
 -----------------------------------------------------------
-ScriptsTab:AddSection("Scripts Universais abaixo ☟")
 
-ScriptsTab:AddButton({
+-- Adicionando o script de voo
+Tabs.Scripts:AddButton({
     Title = "Fly gui V3🕊️",
     Description = "Voar pelo mapa!",
     Callback = function()
@@ -280,7 +280,8 @@ ScriptsTab:AddButton({
     end
 })
 
-ScriptsTab:AddButton({
+-- Adicionando o script Rael Hub
+Tabs.Scripts:AddButton({
     Title = "Rael hub",
     Description = "Mandrakes👍",
     Callback = function()
@@ -288,14 +289,14 @@ ScriptsTab:AddButton({
     end
 })
 
-ScriptsTab:AddButton({
+-- Adicionando o script Mango Hub
+Tabs.Scripts:AddButton({
     Title = "Mango hub",
     Description = "🥭",
     Callback = function()
         loadstring(game:HttpGet("https://raw.githubusercontent.com/rogelioajax/lua/main/MangoHub", true))()
     end
 })
-
 
 
 
