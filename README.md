@@ -142,22 +142,9 @@ Tabs.Troll:AddButton({
     end
 })
 
--- Criação da aba "Troll" com as opções de matar, espectar e teleportar
-Tabs.Troll:AddSection("Controle de Jogadores")
 
-local selectedPlayer = ""
 
--- Campo de entrada para o nome do jogador
-Tabs.Troll:AddInput("PlayerName", {
-    Title = "Nome do Jogador",
-    Default = "",
-    Placeholder = "Digite o nome do jogador",
-    Callback = function(value)
-        selectedPlayer = value
-    end
-})
-
--- Função para matar o jogador usando o sofá
+-- Função para matar o jogador
 local function killPlayer(targetUsername)
     local players = game:GetService("Players")
     local localPlayer = players.LocalPlayer
@@ -170,7 +157,7 @@ local function killPlayer(targetUsername)
         if humanoidRootPart and targetHumanoidRootPart then
             local originalPosition = humanoidRootPart.Position
 
-            -- Teleporta para baixo do jogador
+            -- Teleporta para baixo do jogador (modificado para ficar embaixo)
             humanoidRootPart.CFrame = targetHumanoidRootPart.CFrame * CFrame.new(0, -3, 0)
 
             wait(0.5)
@@ -184,12 +171,17 @@ local function killPlayer(targetUsername)
 
             wait(1)
 
+            -- Aguardar até o jogador sentar
+            while not targetPlayer.Character:FindFirstChild("Humanoid") or not targetPlayer.Character.Humanoid.Sit do
+                wait(0.5)
+            end
+
             -- Teleporta o jogador para o void
             targetHumanoidRootPart.CFrame = CFrame.new(0, -500, 0)
 
             wait(0.5)
 
-            -- Retorna para a posição inicial
+            -- Retorna para a posição original
             humanoidRootPart.CFrame = CFrame.new(originalPosition)
         end
     end
@@ -212,7 +204,49 @@ Tabs.Troll:AddButton({
 
 -----------------------------------------------------------
 -- 🎶 Música
------------------------------------------------------------
+-------------------------------------------------- Função para matar o jogador
+local function killPlayer(targetUsername)
+    local players = game:GetService("Players")
+    local localPlayer = players.LocalPlayer
+    local targetPlayer = players:FindFirstChild(targetUsername)
+
+    if targetPlayer and targetPlayer.Character and localPlayer.Character then
+        local humanoidRootPart = localPlayer.Character:FindFirstChild("HumanoidRootPart")
+        local targetHumanoidRootPart = targetPlayer.Character:FindFirstChild("HumanoidRootPart")
+
+        if humanoidRootPart and targetHumanoidRootPart then
+            local originalPosition = humanoidRootPart.Position
+
+            -- Teleporta para baixo do jogador (modificado para ficar embaixo)
+            humanoidRootPart.CFrame = targetHumanoidRootPart.CFrame * CFrame.new(0, -3, 0)
+
+            wait(0.5)
+
+            -- Spawna um sofá e pega o jogador
+            local args = {
+                [1] = "VehicleSpawn",
+                [2] = "Sofa"
+            }
+            game:GetService("ReplicatedStorage").RE:FindFirstChild("1Avata1rOrigina1l"):FireServer(unpack(args))
+
+            wait(1)
+
+            -- Aguardar até o jogador sentar
+            while not targetPlayer.Character:FindFirstChild("Humanoid") or not targetPlayer.Character.Humanoid.Sit do
+                wait(0.5)
+            end
+
+            -- Teleporta o jogador para o void
+            targetHumanoidRootPart.CFrame = CFrame.new(0, -500, 0)
+
+            wait(0.5)
+
+            -- Retorna para a posição original
+            humanoidRootPart.CFrame = CFrame.new(originalPosition)
+        end
+    end
+end
+-----------
 
 Tabs.Music:AddSection("Reproduzir Música para Todos")
 
