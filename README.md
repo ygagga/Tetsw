@@ -280,24 +280,6 @@ Tabs.Scripts:AddButton({
     end
 })
 
--- Adicionando o script Rael Hub
-Tabs.Scripts:AddButton({
-    Title = "Rael hub",
-    Description = "Mandrakes👍",
-    Callback = function()
-        loadstring(game:HttpGet("https://raw.githubusercontent.com/Laelmano24/Rael-Hub/refs/heads/main/Universal/script.txt"))()
-    end
-})
-
--- Adicionando o script Mango Hub
-Tabs.Scripts:AddButton({
-    Title = "Mango hub",
-    Description = "🥭",
-    Callback = function()
-        loadstring(game:HttpGet("https://raw.githubusercontent.com/rogelioajax/lua/main/MangoHub", true))()
-    end
-})
-
 
 
 -----------------------------------------------------------
