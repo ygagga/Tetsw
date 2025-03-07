@@ -3,6 +3,14 @@ local Fluent = loadstring(game:HttpGet("https://github.com/dawid-scripts/Fluent/
 local SaveManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Addons/SaveManager.lua"))()
 local InterfaceManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Addons/InterfaceManager.lua"))()
 
+local playerService = game:GetService('Players')
+local runService = game:GetService('RunService')
+
+local player = playerService.LocalPlayer
+local selectedPlayer = nil
+local isSpectating = false
+local camera = workspace.CurrentCamera
+
 -- Criando a Janela da Interface
 local Window = Fluent:CreateWindow({
     Title = "Brookhaven RP 🏡 (Troll Hub 🤡)",
@@ -17,24 +25,8 @@ local Window = Fluent:CreateWindow({
 -- Criando Abas
 local Tabs = {
     Troll = Window:AddTab({ Title = "🤡 Troll", Icon = "alert" }),
-    Music = Window:AddTab({ Title = "🎶 Música", Icon = "music" }),
     About = Window:AddTab({ Title = "ℹ️ Sobre", Icon = "info" })
 }
-
-
--- Adiciona uma seção para controle de jogadores na aba Troll
-Tabs.Troll:AddSection("Controle de Jogadores")
-
-
-local playerService = game:GetService('Players')
-local runService = game:GetService('RunService')
-
-local player = playerService.LocalPlayer
-local selectedPlayer = nil
-local isSpectating = false
-local camera = workspace.CurrentCamera
-
-
 
 -- Função para encontrar jogadores pelo nome
 local function gplr(String)
@@ -158,64 +150,3 @@ Tabs.Troll:AddButton({
         stopSpectating()
         Window:Notify({ Title = "Visualização",
         
-
-
------------------------------------------------------------
--- 🎶 Música
------------------------------------------------------------
-
-Tabs.Music:AddSection("Reproduzir Música para Todos")
-
-local musicId = ""  -- ID da música a ser tocada
-local loopMusic = false  -- Controle de loop da música
-local musicPlaying = nil  -- Armazena o som que está tocando
-
--- Função para tocar música em loop para todos os jogadores
-local function playMusicForAll(id, loop)
-    -- Checa se já existe uma música tocando, e se sim, para ela
-    if musicPlaying then
-        musicPlaying:Stop()
-        musicPlaying:Destroy()
-    end
-
-    -- Cria um novo objeto de som no Workspace
-    musicPlaying = Instance.new("Sound")
-    musicPlaying.SoundId = "rbxassetid://" .. id
-    musicPlaying.Looped = loop
-    musicPlaying.Volume = 1  -- Volume máximo
-    musicPlaying.Parent = game:GetService("Workspace")  -- Coloca o som no Workspace, assim todos podem ouvir
-
-    musicPlaying:Play()
-end
-
--- Campo de entrada para o ID da música
-Tabs.Music:AddInput("MusicID", {
-    Title = "ID da Música",
-    Default = "",
-    Placeholder = "Digite o ID da música",
-    Numeric = true,
-    Finished = true,
-    Callback = function(value)
-        musicId = value
-    end
-})
-
--- Campo de seleção para o loop da música
-Tabs.Music:AddToggle("LoopMusic", {
-    Title = "Loop",
-    Default = false,
-    Callback = function(value)
-        loopMusic = value
-    end
-})
-
--- Botão para iniciar a música para todos os jogadores
-Tabs.Music:AddButton({
-    Title = "Reproduzir Música 🎶",
-    Description = "Reproduza a música para todos os jogadores.",
-    Callback = function()
-        if musicId ~= "" then
-            playMusicForAll(musicId, loopMusic)
-        end
-    end
-})
