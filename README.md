@@ -123,23 +123,6 @@ Tabs.Troll:AddButton({
 
 
 
--- Carrega as bibliotecas Fluent, SaveManager e InterfaceManager
-local Fluent = loadstring(game:HttpGet("https://github.com/dawid-scripts/Fluent/releases/latest/download/main.lua"))()
-local SaveManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Addons/SaveManager.lua"))()
-local InterfaceManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Addons/InterfaceManager.lua"))()
-
--- Criando a Janela da Interface
-local Window = Fluent:CreateWindow({
-    Title = "Brookhaven RP 🏡 (Troll Hub 🤡)",
-    SubTitle = "🔥 Zoando geral! 💀",
-    TabWidth = 160,
-    Size = UDim2.fromOffset(500, 320),
-    Acrylic = true,
-    Theme = "Dark",
-    MinimizeKey = Enum.KeyCode.LeftControl
-})
-
-
 -----------------------------------------------------------
 -- 🎶 Música
 -----------------------------------------------------------
@@ -153,18 +136,14 @@ local loopMusic = false  -- Controle de loop da música
 local function playMusicForAll(id, loop)
     local players = game:GetService("Players")
     
-    for _, player in pairs(players:GetPlayers()) do
-        local character = player.Character
-        if character then
-            -- Cria um objeto de som
-            local sound = Instance.new("Sound")
-            sound.SoundId = "rbxassetid://" .. id
-            sound.Looped = loop
-            sound.Volume = 0.5  -- Define o volume (ajuste conforme necessário)
-            sound.Parent = character:FindFirstChild("HumanoidRootPart")  -- Toca no "HumanoidRootPart"
-            sound:Play()
-        end
-    end
+    -- Cria um objeto de som no Workspace
+    local sound = Instance.new("Sound")
+    sound.SoundId = "rbxassetid://" .. id
+    sound.Looped = loop
+    sound.Volume = 1  -- Volume máximo
+    sound.Parent = game:GetService("Workspace")  -- Coloca o som no Workspace, assim todos podem ouvir
+    
+    sound:Play()
 end
 
 -- Campo de entrada para o ID da música
@@ -194,15 +173,5 @@ Tabs.Music:AddButton({
     Description = "Reproduza a música para todos os jogadores.",
     Callback = function()
         if musicId ~= "" then
-            playMusicForAll(musicId, loopMusic)
-        else
-            game:GetService("StarterGui"):SetCore("SendNotification", {
-                Title = "Erro",
-                Text = "ID da música não fornecido.",
-                Duration = 3
-            })
-        end
-    end
-})
-
-
+            playMusicForAll(music
+            
