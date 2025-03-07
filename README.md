@@ -168,31 +168,35 @@ end
 antiSit()
 
 -- Adiciona os botões na aba Troll
-Tabs.Troll:AddButton({
-    Title = "Ativar Anti-Sit (Para Você)",
-    Description = "Impedir que você se sente em qualquer lugar",
-    Callback = function()
-        antiSitEnabled = true
-        Window:Notify({
-            Title = "Anti-Sit Ativado",
-            Description = "Você não poderá mais se sentar.",
-            Duration = 5
-        })
-    end
-})
+if Tabs.Troll then
+    Tabs.Troll:AddButton({
+        Title = "Ativar Anti-Sit (Para Você)",
+        Description = "Impedir que você se sente em qualquer lugar",
+        Callback = function()
+            antiSitEnabled = true
+            Window:Notify({
+                Title = "Anti-Sit Ativado",
+                Description = "Você não poderá mais se sentar.",
+                Duration = 5
+            })
+        end
+    })
 
-Tabs.Troll:AddButton({
-    Title = "Desativar Anti-Sit (Para Você)",
-    Description = "Permitir que você se sente novamente",
-    Callback = function()
-        disableAntiSit()
-        Window:Notify({
-            Title = "Anti-Sit Desativado",
-            Description = "Você pode se sentar novamente.",
-            Duration = 5
-        })
-    end
-})
+    Tabs.Troll:AddButton({
+        Title = "Desativar Anti-Sit (Para Você)",
+        Description = "Permitir que você se senta novamente",
+        Callback = function()
+            disableAntiSit()
+            Window:Notify({
+                Title = "Anti-Sit Desativado",
+                Description = "Você pode se sentar novamente.",
+                Duration = 5
+            })
+        end
+    })
+else
+    warn("Abas 'Troll' não encontradas")
+end
 
 
 
