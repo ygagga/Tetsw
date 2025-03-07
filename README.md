@@ -16,18 +16,16 @@ local Window = Fluent:CreateWindow({
 
 -- Criando Abas
 local Tabs = {
-    Avatar = Window:AddTab({ Title = "👤 Avatar", Icon = "shirt" }),
     Troll = Window:AddTab({ Title = "🤡 Troll", Icon = "alert" }),
-    Hacks = Window:AddTab({ Title = "⚡ Hacks", Icon = "zap" }),
     About = Window:AddTab({ Title = "ℹ️ Sobre", Icon = "info" })
 }
 
 -----------------------------------------------------------
--- 🤡 Troll (Teleport)
+-- 🤡 Troll (Teleport, Spectar e Matar)
 -----------------------------------------------------------
 Tabs.Troll:AddSection("Zoando geral! 💀")
 
--- Input para escolher o jogador a teleportar
+-- Input para escolher o jogador
 local TargetPlayer = ""
 
 Tabs.Troll:AddInput("TargetPlayer", {
@@ -48,6 +46,59 @@ Tabs.Troll:AddButton({
         local target = players:FindFirstChild(TargetPlayer)
         if target and target.Character and target.Character:FindFirstChild("HumanoidRootPart") then
             players.LocalPlayer.Character:MoveTo(target.Character.HumanoidRootPart.Position)
+        else
+            Fluent:Notify({
+                Title = "Erro!",
+                Content = "Jogador não encontrado ou sem personagem!",
+                Duration = 3
+            })
+        end
+    end
+})
+
+-- Botão para Spectar o Jogador
+Tabs.Troll:AddButton({
+    Title = "Spectar Jogador",
+    Description = "Veja tudo o que o jogador está fazendo!",
+    Callback = function()
+        local players = game:GetService("Players")
+        local target = players:FindFirstChild(TargetPlayer)
+        if target and target.Character then
+            workspace.CurrentCamera.CameraSubject = target.Character:FindFirstChildOfClass("Humanoid")
+            Fluent:Notify({
+                Title = "Spectando...",
+                Content = "Pressione qualquer tecla para sair do modo espectador.",
+                Duration = 5
+            })
+
+            -- Resetar a câmera quando o jogador pressionar uma tecla
+            game:GetService("UserInputService").InputBegan:Connect(function()
+                workspace.CurrentCamera.CameraSubject = players.LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
+            end)
+        else
+            Fluent:Notify({
+                Title = "Erro!",
+                Content = "Jogador não encontrado!",
+                Duration = 3
+            })
+        end
+    end
+})
+
+-- Botão para Matar o Jogador
+Tabs.Troll:AddButton({
+    Title = "Matar Jogador 💀",
+    Description = "Elimina o jogador instantaneamente!",
+    Callback = function()
+        local players = game:GetService("Players")
+        local target = players:FindFirstChild(TargetPlayer)
+        if target and target.Character and target.Character:FindFirstChild("Humanoid") then
+            target.Character:FindFirstChild("Humanoid").Health = 0
+            Fluent:Notify({
+                Title = "Morto!",
+                Content = TargetPlayer .. " foi eliminado! 💀",
+                Duration = 3
+            })
         else
             Fluent:Notify({
                 Title = "Erro!",
