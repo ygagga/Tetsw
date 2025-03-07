@@ -1,47 +1,69 @@
--- Carrega a biblioteca OrionLib
-local OrionLib = loadstring(game:HttpGet(('https://raw.githubusercontent.com/shlexware/Orion/main/source')))()
+-- Carrega as bibliotecas Fluent, SaveManager e InterfaceManager
+local Fluent = loadstring(game:HttpGet("https://github.com/dawid-scripts/Fluent/releases/latest/download/main.lua"))()
+local SaveManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Addons/SaveManager.lua"))()
+local InterfaceManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Addons/InterfaceManager.lua"))()
 
--- Cria a Janela Principal
-local Window = OrionLib:MakeWindow({
-    Name = "Brookhaven RP 🏡 (Troll Hub 🤡)",
-    HidePremium = false,
-    SaveConfig = false,
-    ConfigFolder = "TrollHub"
+-- Criando a Janela da Interface
+local Window = Fluent:CreateWindow({
+    Title = "Brookhaven RP 🏡 (Troll Hub 🤡)",
+    SubTitle = "🔥 Zoando geral! 💀",
+    TabWidth = 160,
+    Size = UDim2.fromOffset(500, 320),
+    Acrylic = true,
+    Theme = "Dark",
+    MinimizeKey = Enum.KeyCode.LeftControl
 })
 
--- Criando a Aba de Scripts Universais
-local ScriptsTab = Window:MakeTab({
-    Name = "☢️ Scripts Universais",
-    Icon = "rbxassetid://4483345998",
-    PremiumOnly = false
-})
+-- Criando Abas
+local Tabs = {
+    Avatar = Window:AddTab({ Title = "👤 Avatar", Icon = "shirt" }),
+    Troll = Window:AddTab({ Title = "🤡 Troll", Icon = "alert" }),
+    Hacks = Window:AddTab({ Title = "⚡ Hacks", Icon = "zap" }),
+    About = Window:AddTab({ Title = "ℹ️ Sobre", Icon = "info" })
+}
 
--- Adicionando seção para Scripts Universais
-ScriptsTab:AddSection("Scripts Universais abaixo ☟")
+-----------------------------------------------------------
+-- 🤡 Troll (Teleport)
+-----------------------------------------------------------
+Tabs.Troll:AddSection("Zoando geral! 💀")
 
--- Botão para Fly GUI V3
-ScriptsTab:AddButton({
-    Name = "Fly gui V3🕊️",
-    Callback = function()
-        loadstring(game:HttpGet("https://raw.githubusercontent.com/XNEOFF/FlyGuiV3/main/FlyGuiV3.txt"))()
+-- Input para escolher o jogador a teleportar
+local TargetPlayer = ""
+
+Tabs.Troll:AddInput("TargetPlayer", {
+    Title = "Nome do Jogador",
+    Default = "",
+    Placeholder = "Digite o nome...",
+    Callback = function(value)
+        TargetPlayer = value
     end
 })
 
--- Botão para Rael Hub
-ScriptsTab:AddButton({
-    Name = "Rael hub",
+-- Botão para Teleportar ao Jogador
+Tabs.Troll:AddButton({
+    Title = "Teleportar para Jogador",
+    Description = "Leva você até o jogador selecionado!",
     Callback = function()
-        loadstring(game:HttpGet("https://raw.githubusercontent.com/Laelmano24/Rael-Hub/refs/heads/main/Universal/script.txt"))()
+        local players = game:GetService("Players")
+        local target = players:FindFirstChild(TargetPlayer)
+        if target and target.Character and target.Character:FindFirstChild("HumanoidRootPart") then
+            players.LocalPlayer.Character:MoveTo(target.Character.HumanoidRootPart.Position)
+        else
+            Fluent:Notify({
+                Title = "Erro!",
+                Content = "Jogador não encontrado ou sem personagem!",
+                Duration = 3
+            })
+        end
     end
 })
 
--- Botão para Mango Hub
-ScriptsTab:AddButton({
-    Name = "Mango hub 🥭",
-    Callback = function()
-        loadstring(game:HttpGet("https://raw.githubusercontent.com/rogelioajax/lua/main/MangoHub", true))()
-    end
-})
+-----------------------------------------------------------
+-- ℹ️ Sobre
+-----------------------------------------------------------
+Tabs.About:AddSection("Criado por Shelby, user discord: snobodj")
+Tabs.About:AddParagraph("Criado por Troll Hub para bagunçar no Brookhaven RP!")
+Tabs.About:AddParagraph("Aproveite e divirta-se, mas sem exagerar! 😆")
 
--- Faz a interface aparecer
-OrionLib:Init()
+-- Inicializa a Interface
+Window:SelectTab(1)
