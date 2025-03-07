@@ -21,7 +21,7 @@ local Tabs = {
 }
 
 -----------------------------------------------------------
--- 🤡 Troll (Teleport, Spectar e Matar)
+-- 🤡 Troll (Teleport, Spectar e Matar com Sofá)
 -----------------------------------------------------------
 Tabs.Troll:AddSection("Zoando geral! 💀")
 
@@ -85,20 +85,59 @@ Tabs.Troll:AddButton({
     end
 })
 
--- Botão para Matar o Jogador
+-- Botão para Matar com Sofá
 Tabs.Troll:AddButton({
-    Title = "Matar Jogador 💀",
-    Description = "Elimina o jogador instantaneamente!",
+    Title = "Matar com Sofá 💀",
+    Description = "Usa um sofá para mandar o jogador pro void!",
     Callback = function()
         local players = game:GetService("Players")
         local target = players:FindFirstChild(TargetPlayer)
-        if target and target.Character and target.Character:FindFirstChild("Humanoid") then
-            target.Character:FindFirstChild("Humanoid").Health = 0
-            Fluent:Notify({
-                Title = "Morto!",
-                Content = TargetPlayer .. " foi eliminado! 💀",
-                Duration = 3
-            })
+        local localPlayer = players.LocalPlayer
+        local character = localPlayer.Character
+
+        if target and target.Character and target.Character:FindFirstChild("HumanoidRootPart") then
+            -- Salvar posição original
+            local originalPosition = character.HumanoidRootPart.Position
+
+            -- Criar sofá
+            local seat = Instance.new("Seat")
+            seat.Parent = workspace
+            seat.Anchored = false
+            seat.Position = target.Character.HumanoidRootPart.Position + Vector3.new(0, 3, 0)
+
+            -- Loop para prender o jogador no sofá
+            local killing = true
+            task.spawn(function()
+                while killing do
+                    if target.Character and target.Character:FindFirstChild("HumanoidRootPart") then
+                        character:MoveTo(target.Character.HumanoidRootPart.Position)
+                        seat.Position = target.Character.HumanoidRootPart.Position + Vector3.new(0, 3, 0)
+                    end
+                    task.wait(0.1)
+                end
+            end)
+
+            -- Esperar o jogador sentar
+            seat.ChildAdded:Connect(function(child)
+                if child:IsA("Weld") and child.Part1 and child.Part1.Parent == target.Character then
+                    killing = false -- Parar o loop de teleport
+
+                    -- Jogar no void
+                    seat.Position = Vector3.new(0, -500, 0)
+                    task.wait(1)
+
+                    -- Voltar para posição original
+                    character:MoveTo(originalPosition)
+
+                    -- Remover sofá
+                    seat:Destroy()
+                    Fluent:Notify({
+                        Title = "Morto!",
+                        Content = TargetPlayer .. " foi eliminado no void! 💀",
+                        Duration = 3
+                    })
+                end
+            end)
         else
             Fluent:Notify({
                 Title = "Erro!",
