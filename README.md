@@ -17,6 +17,7 @@ local Window = Fluent:CreateWindow({
 -- Criando Abas
 local Tabs = {
     Troll = Window:AddTab({ Title = "🤡 Troll", Icon = "alert" }),
+    Music = Window:AddTab({ Title = "🎶 Música", Icon = "music" }),
     About = Window:AddTab({ Title = "ℹ️ Sobre", Icon = "info" })
 }
 
@@ -119,3 +120,89 @@ Tabs.Troll:AddButton({
         end
     end
 })
+
+
+
+-- Carrega as bibliotecas Fluent, SaveManager e InterfaceManager
+local Fluent = loadstring(game:HttpGet("https://github.com/dawid-scripts/Fluent/releases/latest/download/main.lua"))()
+local SaveManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Addons/SaveManager.lua"))()
+local InterfaceManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Addons/InterfaceManager.lua"))()
+
+-- Criando a Janela da Interface
+local Window = Fluent:CreateWindow({
+    Title = "Brookhaven RP 🏡 (Troll Hub 🤡)",
+    SubTitle = "🔥 Zoando geral! 💀",
+    TabWidth = 160,
+    Size = UDim2.fromOffset(500, 320),
+    Acrylic = true,
+    Theme = "Dark",
+    MinimizeKey = Enum.KeyCode.LeftControl
+})
+
+
+-----------------------------------------------------------
+-- 🎶 Música
+-----------------------------------------------------------
+
+Tabs.Music:AddSection("Reproduzir Música para Todos")
+
+local musicId = ""  -- ID da música a ser tocada
+local loopMusic = false  -- Controle de loop da música
+
+-- Função para tocar música em loop para todos os jogadores
+local function playMusicForAll(id, loop)
+    local players = game:GetService("Players")
+    
+    for _, player in pairs(players:GetPlayers()) do
+        local character = player.Character
+        if character then
+            -- Cria um objeto de som
+            local sound = Instance.new("Sound")
+            sound.SoundId = "rbxassetid://" .. id
+            sound.Looped = loop
+            sound.Volume = 0.5  -- Define o volume (ajuste conforme necessário)
+            sound.Parent = character:FindFirstChild("HumanoidRootPart")  -- Toca no "HumanoidRootPart"
+            sound:Play()
+        end
+    end
+end
+
+-- Campo de entrada para o ID da música
+Tabs.Music:AddInput("MusicID", {
+    Title = "ID da Música",
+    Default = "",
+    Placeholder = "Digite o ID da música",
+    Numeric = true,
+    Finished = true,
+    Callback = function(value)
+        musicId = value
+    end
+})
+
+-- Campo de seleção para o loop da música
+Tabs.Music:AddToggle("LoopMusic", {
+    Title = "Loop",
+    Default = false,
+    Callback = function(value)
+        loopMusic = value
+    end
+})
+
+-- Botão para iniciar a música para todos os jogadores
+Tabs.Music:AddButton({
+    Title = "Reproduzir Música 🎶",
+    Description = "Reproduza a música para todos os jogadores.",
+    Callback = function()
+        if musicId ~= "" then
+            playMusicForAll(musicId, loopMusic)
+        else
+            game:GetService("StarterGui"):SetCore("SendNotification", {
+                Title = "Erro",
+                Text = "ID da música não fornecido.",
+                Duration = 3
+            })
+        end
+    end
+})
+
+
