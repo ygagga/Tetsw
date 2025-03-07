@@ -25,8 +25,76 @@ local Tabs = {
 -- Adiciona uma seção para controle de jogadores na aba Troll
 Tabs.Troll:AddSection("Controle de Jogadores")
 
-local selectedPlayer = ""
-local isSpectating = false  -- Variável para controlar o espectar
+
+local playerService = game:GetService('Players')
+local runService = game:GetService('RunService')
+
+local player = playerService.LocalPlayer
+local selectedPlayer = nil
+local isSpectating = false
+local camera = workspace.CurrentCamera
+
+
+
+-- Função para encontrar jogadores pelo nome
+local function gplr(String)
+    local strl = String:lower()
+    for _, v in pairs(playerService:GetPlayers()) do
+        if v.Name:lower():sub(1, #strl) == strl then
+            return v
+        end
+    end
+    return nil
+end
+
+-- Função para teleportar o jogador para o void ao sentar
+local function teleportToVoid()
+    player.Character.HumanoidRootPart.CFrame = CFrame.new(Vector3.new(-47, -469, -44))
+end
+
+-- Função para seguir o jogador e teleportá-lo ao void ao sentar
+local function followAndTeleport(targetPlayer)
+    if not targetPlayer or not targetPlayer.Character then return end
+
+    local connection
+    connection = runService.Heartbeat:Connect(function()
+        if targetPlayer.Character and targetPlayer.Character:FindFirstChild("HumanoidRootPart") then
+            local targetCFrame = targetPlayer.Character.HumanoidRootPart.CFrame
+            player.Character.HumanoidRootPart.CFrame = targetCFrame + Vector3.new(0, 1, 0)
+
+            if targetPlayer.Character:FindFirstChild("Humanoid") and targetPlayer.Character.Humanoid.Sit then
+                teleportToVoid()
+                connection:Disconnect()
+            end
+        else
+            connection:Disconnect()
+        end
+    end)
+end
+
+-- Função para teleportar até o jogador
+local function teleportToPlayer(targetPlayer)
+    if targetPlayer and targetPlayer.Character and player.Character then
+        player.Character.HumanoidRootPart.CFrame = targetPlayer.Character.HumanoidRootPart.CFrame
+    end
+end
+
+-- Função para espectar o jogador
+local function spectatePlayer(targetPlayer)
+    if targetPlayer and targetPlayer.Character then
+        isSpectating = true
+        camera.CameraSubject = targetPlayer.Character:FindFirstChildOfClass("Humanoid")
+    end
+end
+
+-- Função para parar de espectar
+local function stopSpectating()
+    isSpectating = false
+    camera.CameraSubject = player.Character:FindFirstChildOfClass("Humanoid")
+end
+
+-- Adiciona uma seção para controle de jogadores na aba Troll
+Tabs.Troll:AddSection("Controle de Jogadores")
 
 -- Campo de entrada para o nome do jogador
 Tabs.Troll:AddInput("PlayerName", {
@@ -34,81 +102,62 @@ Tabs.Troll:AddInput("PlayerName", {
     Default = "",
     Placeholder = "Digite o nome do jogador",
     Callback = function(value)
-        selectedPlayer = value
+        selectedPlayer = gplr(value)
+        if selectedPlayer then
+            Window:Notify({ Title = "Jogador Encontrado", Description = selectedPlayer.Name, Duration = 3 })
+        else
+            Window:Notify({ Title = "Erro", Description = "Nenhum jogador encontrado!", Duration = 3 })
+        end
     end
 })
 
--- Função para teleportar todos os jogadores para o local do jogador que executou o comando
-local function teleportAllPlayers()
-    local players = game:GetService("Players")
-    local localPlayer = players.LocalPlayer
-    local localHumanoidRootPart = localPlayer.Character:FindFirstChild("HumanoidRootPart")
-
-    if localHumanoidRootPart then
-        -- Teleportando todos os jogadores para a posição do jogador atual
-        for _, targetPlayer in pairs(players:GetPlayers()) do
-            if targetPlayer.Character and targetPlayer ~= localPlayer then
-                local targetHumanoidRootPart = targetPlayer.Character:FindFirstChild("HumanoidRootPart")
-                if targetHumanoidRootPart then
-                    targetHumanoidRootPart.CFrame = localHumanoidRootPart.CFrame
-                end
-            end
+-- Botão para matar (teletransportar ao void)
+Tabs.Troll:AddButton({
+    Title = "Matar 💀",
+    Description = "Mata o jogador selecionado.",
+    Callback = function()
+        if selectedPlayer then
+            followAndTeleport(selectedPlayer)
+        else
+            Window:Notify({ Title = "Erro", Description = "Nenhum jogador selecionado!", Duration = 3 })
         end
     end
-end
+})
 
--- Função para espectar o jogador
-local function spectatePlayer(targetUsername)
-    local players = game:GetService("Players")
-    local localPlayer = players.LocalPlayer
-    local targetPlayer = players:FindFirstChild(targetUsername)
-
-    if targetPlayer and targetPlayer.Character then
-        local camera = game.Workspace.CurrentCamera
-        camera.CameraSubject = targetPlayer.Character:FindFirstChildOfClass("Humanoid")
-        isSpectating = true
-    end
-end
-
--- Função para despectar (retornar a câmera para o jogador original)
-local function despectatePlayer()
-    local players = game:GetService("Players")
-    local localPlayer = players.LocalPlayer
-    local camera = game.Workspace.CurrentCamera
-    camera.CameraSubject = localPlayer.Character:FindFirstChildOfClass("Humanoid")
-    isSpectating = false
-end
-
--- Botão para teleportar todos os jogadores para o jogador
+-- Botão para teleportar até o jogador
 Tabs.Troll:AddButton({
-    Title = "Teleportar Todos 🏃‍♂️",
-    Description = "Teleporta todos os jogadores para você!",
+    Title = "Teleportar 🏃",
+    Description = "Teleporta até o jogador.",
     Callback = function()
-        teleportAllPlayers()
+        if selectedPlayer then
+            teleportToPlayer(selectedPlayer)
+        else
+            Window:Notify({ Title = "Erro", Description = "Nenhum jogador selecionado!", Duration = 3 })
+        end
     end
 })
 
 -- Botão para espectar o jogador
 Tabs.Troll:AddButton({
     Title = "Espectar 👀",
-    Description = "Veja o que o jogador está fazendo",
+    Description = "Veja o que o jogador está fazendo.",
     Callback = function()
-        if selectedPlayer ~= "" then
+        if selectedPlayer then
             spectatePlayer(selectedPlayer)
+        else
+            Window:Notify({ Title = "Erro", Description = "Nenhum jogador selecionado!", Duration = 3 })
         end
     end
 })
 
--- Botão para despectar (voltar para o jogador original)
+-- Botão para parar de espectar
 Tabs.Troll:AddButton({
-    Title = "Despectar 🚶‍♂️",
-    Description = "Volte para o seu personagem!",
+    Title = "Parar de Espectar ❌",
+    Description = "Retorna sua visão para você mesmo.",
     Callback = function()
-        if isSpectating then
-            despectatePlayer()
-        end
-    end
-})
+        stopSpectating()
+        Window:Notify({ Title = "Visualização",
+        
 
 
 -----------------------------------------------------------
