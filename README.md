@@ -46,6 +46,7 @@ local Tabs = {
     Troll = Window:AddTab({ Title = "🤡 Troll", Icon = "alert" }),
     Music = Window:AddTab({ Title = "🎶 Música", Icon = "music" }),
     Hacks = Window:AddTab({ Title = "⚡ Hacks", Icon = "zap" }),
+    Scripts = Window:AddTab({ Title = "🧑‍💻 Scripts", Icon = "code" }),
     About = Window:AddTab({ Title = "ℹ️ Sobre", Icon = "info" })
 }
 
@@ -308,6 +309,38 @@ Tabs.Hacks:AddButton({
         })
     end
 })
+
+
+
+-- Adiciona os scripts na aba Scripts
+Tabs.Scripts:AddSection("Carregar Scripts")
+
+-- Botões para carregar os scripts
+Tabs.Scripts:AddButton({
+    Title = "Fly Script ✈️",
+    Description = "Ativa o Fly script.",
+    Callback = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/XNEOFF/FlyGuiV3/main/FlyGuiV3.txt"))()
+    end
+})
+
+Tabs.Scripts:AddButton({
+    Title = "RAEL Hub 🔧",
+    Description = "Carrega o RAEL Hub.",
+    Callback = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/Laelmano24/Rael-Hub/main/main.txt"))()
+    end
+})
+
+Tabs.Scripts:AddButton({
+    Title = "Sander X 🛸",
+    Description = "Carrega o Sander X.",
+    Callback = function()
+        loadstring(game:HttpGet('https://raw.githubusercontent.com/sXPiterXs1111/Sanderxv3.30/main/sanderx3.30'))()
+    end
+})
+
+
 
 -----------------------------------------------------------
 -- ℹ️ Sobre
