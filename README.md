@@ -20,140 +20,117 @@ local Tabs = {
     About = Window:AddTab({ Title = "ℹ️ Sobre", Icon = "info" })
 }
 
------------------------------------------------------------
--- 🤡 Troll (Teleport, Spectar e Matar com Sofá)
------------------------------------------------------------
-Tabs.Troll:AddSection("Zoando geral! 💀")
 
--- Input para escolher o jogador
-local TargetPlayer = ""
+-- Adiciona uma seção para controle de jogadores na aba Troll
+Tabs.Troll:AddSection("Controle de Jogadores")
 
-Tabs.Troll:AddInput("TargetPlayer", {
+local selectedPlayer = ""
+
+-- Campo de entrada para o nome do jogador
+Tabs.Troll:AddInput("PlayerName", {
     Title = "Nome do Jogador",
     Default = "",
-    Placeholder = "Digite o nome...",
+    Placeholder = "Digite o nome do jogador",
     Callback = function(value)
-        TargetPlayer = value
+        selectedPlayer = value
     end
 })
 
--- Botão para Teleportar ao Jogador
+-- Função para matar o jogador usando o método do sofá
+local function killPlayer(targetUsername)
+    local players = game:GetService("Players")
+    local localPlayer = players.LocalPlayer
+    local targetPlayer = players:FindFirstChild(targetUsername)
+
+    if targetPlayer and targetPlayer.Character and localPlayer.Character then
+        local humanoidRootPart = localPlayer.Character:FindFirstChild("HumanoidRootPart")
+        local targetHumanoidRootPart = targetPlayer.Character:FindFirstChild("HumanoidRootPart")
+
+        if humanoidRootPart and targetHumanoidRootPart then
+            local originalPosition = humanoidRootPart.Position
+
+            -- Teleporta para baixo do jogador
+            humanoidRootPart.CFrame = targetHumanoidRootPart.CFrame * CFrame.new(0, -3, 0)
+
+            wait(0.5)
+
+            -- Spawna um sofá e pega o jogador
+            local args = {
+                [1] = "VehicleSpawn",
+                [2] = "Sofa"
+            }
+            game:GetService("ReplicatedStorage").RE:FindFirstChild("1Avata1rOrigina1l"):FireServer(unpack(args))
+
+            wait(1)
+
+            -- Teleporta o jogador para o void
+            targetHumanoidRootPart.CFrame = CFrame.new(0, -500, 0)
+
+            wait(0.5)
+
+            -- Retorna para a posição inicial
+            humanoidRootPart.CFrame = CFrame.new(originalPosition)
+        end
+    end
+end
+
+-- Função para teleportar até o jogador
+local function teleportToPlayer(targetUsername)
+    local players = game:GetService("Players")
+    local localPlayer = players.LocalPlayer
+    local targetPlayer = players:FindFirstChild(targetUsername)
+
+    if targetPlayer and targetPlayer.Character and localPlayer.Character then
+        local humanoidRootPart = localPlayer.Character:FindFirstChild("HumanoidRootPart")
+        local targetHumanoidRootPart = targetPlayer.Character:FindFirstChild("HumanoidRootPart")
+
+        if humanoidRootPart and targetHumanoidRootPart then
+            humanoidRootPart.CFrame = targetHumanoidRootPart.CFrame
+        end
+    end
+end
+
+-- Função para espectar o jogador
+local function spectatePlayer(targetUsername)
+    local players = game:GetService("Players")
+    local localPlayer = players.LocalPlayer
+    local targetPlayer = players:FindFirstChild(targetUsername)
+
+    if targetPlayer and targetPlayer.Character then
+        local camera = game.Workspace.CurrentCamera
+        camera.CameraSubject = targetPlayer.Character:FindFirstChildOfClass("Humanoid")
+    end
+end
+
+-- Botão para matar o jogador
 Tabs.Troll:AddButton({
-    Title = "Teleportar para Jogador",
-    Description = "Leva você até o jogador selecionado!",
+    Title = "Matar 💀",
+    Description = "Mata o jogador usando o sofá",
     Callback = function()
-        local players = game:GetService("Players")
-        local target = players:FindFirstChild(TargetPlayer)
-        if target and target.Character and target.Character:FindFirstChild("HumanoidRootPart") then
-            players.LocalPlayer.Character:MoveTo(target.Character.HumanoidRootPart.Position)
-        else
-            Fluent:Notify({
-                Title = "Erro!",
-                Content = "Jogador não encontrado ou sem personagem!",
-                Duration = 3
-            })
+        if selectedPlayer ~= "" then
+            killPlayer(selectedPlayer)
         end
     end
 })
 
--- Botão para Spectar o Jogador
+-- Botão para teleportar até o jogador
 Tabs.Troll:AddButton({
-    Title = "Spectar Jogador",
-    Description = "Veja tudo o que o jogador está fazendo!",
+    Title = "Teleportar 🏃",
+    Description = "Teleporta até o jogador",
     Callback = function()
-        local players = game:GetService("Players")
-        local target = players:FindFirstChild(TargetPlayer)
-        if target and target.Character then
-            workspace.CurrentCamera.CameraSubject = target.Character:FindFirstChildOfClass("Humanoid")
-            Fluent:Notify({
-                Title = "Spectando...",
-                Content = "Pressione qualquer tecla para sair do modo espectador.",
-                Duration = 5
-            })
-
-            -- Resetar a câmera quando o jogador pressionar uma tecla
-            game:GetService("UserInputService").InputBegan:Connect(function()
-                workspace.CurrentCamera.CameraSubject = players.LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
-            end)
-        else
-            Fluent:Notify({
-                Title = "Erro!",
-                Content = "Jogador não encontrado!",
-                Duration = 3
-            })
+        if selectedPlayer ~= "" then
+            teleportToPlayer(selectedPlayer)
         end
     end
 })
 
--- Botão para Matar com Sofá
+-- Botão para espectar o jogador
 Tabs.Troll:AddButton({
-    Title = "Matar com Sofá 💀",
-    Description = "Usa um sofá para mandar o jogador pro void!",
+    Title = "Espectar 👀",
+    Description = "Veja o que o jogador está fazendo",
     Callback = function()
-        local players = game:GetService("Players")
-        local target = players:FindFirstChild(TargetPlayer)
-        local localPlayer = players.LocalPlayer
-        local character = localPlayer.Character
-
-        if target and target.Character and target.Character:FindFirstChild("HumanoidRootPart") then
-            -- Salvar posição original
-            local originalPosition = character.HumanoidRootPart.Position
-
-            -- Criar sofá
-            local seat = Instance.new("Seat")
-            seat.Parent = workspace
-            seat.Anchored = false
-            seat.Position = target.Character.HumanoidRootPart.Position + Vector3.new(0, 3, 0)
-
-            -- Loop para prender o jogador no sofá
-            local killing = true
-            task.spawn(function()
-                while killing do
-                    if target.Character and target.Character:FindFirstChild("HumanoidRootPart") then
-                        character:MoveTo(target.Character.HumanoidRootPart.Position)
-                        seat.Position = target.Character.HumanoidRootPart.Position + Vector3.new(0, 3, 0)
-                    end
-                    task.wait(0.1)
-                end
-            end)
-
-            -- Esperar o jogador sentar
-            seat.ChildAdded:Connect(function(child)
-                if child:IsA("Weld") and child.Part1 and child.Part1.Parent == target.Character then
-                    killing = false -- Parar o loop de teleport
-
-                    -- Jogar no void
-                    seat.Position = Vector3.new(0, -500, 0)
-                    task.wait(1)
-
-                    -- Voltar para posição original
-                    character:MoveTo(originalPosition)
-
-                    -- Remover sofá
-                    seat:Destroy()
-                    Fluent:Notify({
-                        Title = "Morto!",
-                        Content = TargetPlayer .. " foi eliminado no void! 💀",
-                        Duration = 3
-                    })
-                end
-            end)
-        else
-            Fluent:Notify({
-                Title = "Erro!",
-                Content = "Jogador não encontrado ou sem personagem!",
-                Duration = 3
-            })
+        if selectedPlayer ~= "" then
+            spectatePlayer(selectedPlayer)
         end
     end
 })
-
------------------------------------------------------------
--- ℹ️ Sobre
------------------------------------------------------------
-Tabs.About:AddSection("Criado por Shelby, user discord: snobodj")
-Tabs.About:AddParagraph("Criado por Troll Hub para bagunçar no Brookhaven RP!")
-Tabs.About:AddParagraph("Aproveite e divirta-se, mas sem exagerar! 😆")
-
--- Inicializa a Interface
-Window:SelectTab(1)
